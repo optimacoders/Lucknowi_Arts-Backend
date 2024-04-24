@@ -1,14 +1,14 @@
 {
   "name": "lucknowi_arts-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "this is new cleint",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Rio",
   "license": "ISC",
   "dependencies": {
     "express": "^4.19.2",
@@ -16,5 +16,6 @@
     "mongoose": "^8.3.2",
     "nodemon": "^3.1.0",
     "router": "^1.3.8"
-  }
+  },
+  "devDependencies": {}
 }
