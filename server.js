@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require("mongoose")
-const user = require("./Models/User")
+const user = require("./Models/Usermodel")
+const productrouter=require("./Routers/ProductRouter");
+const dotenv = require('dotenv');
 
 const app = express();
 
@@ -9,9 +11,15 @@ app.get('/', (req, res) => {
 });
 
 
+dotenv.config();
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
-const mongoDB = "mongodb+srv://optimacoders:l0EMR8N43VOyeIVb@optima.ynqq6o3.mongodb.net/?retryWrites=true&w=majority&appName=optima";
+app.use("/admin",productrouter)
+const cloudinary = require('./Utils/imageupload')
 
+const mongoDB=process.env.MONGODB_URL;
+console.log(mongoDB);
 mongoose.connect(mongoDB,{ useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log('Connected to MongoDB');
@@ -20,6 +28,21 @@ mongoose.connect(mongoDB,{ useNewUrlParser: true, useUnifiedTopology: true })
     console.error('Error connecting to MongoDB:', error);
   });
 
+
+
+  app.post("/Image", async (req, res) => {
+    try {
+        const result = await cloudinary.uploader.upload(req.body.image);
+        console.log(result);
+        return res.status(200).json({ result });
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(400).json({
+            err
+        })
+    }
+});
 const PORT = process.env.PORT || 9000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
