@@ -4,7 +4,12 @@ const cloudinary = require('../Utils/imageupload')
 
 const addproduct = async (req, res) => {
     try { 
+        console.log(req)
         const { title, description, quantity, original_price, selling_price, image, category, size, color, video, material } = req.body;
+        console.log(title,image);
+        const imageUrl = await cloudinary.uploader.upload(image);
+        console.log("dd",product)
+        console.log("imageUrl", imageUrl);
         const product = new Productmodel({
             title,
             description,
@@ -18,9 +23,6 @@ const addproduct = async (req, res) => {
             video,
             material
         });
-        console.log("dd",product)
-        const imageUrl = await cloudinary.uploader.upload(image);
-        console.log("imageUrl", imageUrl);
         await product.save();
         return res.status(201).send({
             status: true,
