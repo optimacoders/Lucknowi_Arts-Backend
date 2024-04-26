@@ -103,6 +103,10 @@ const login = async (req, res) => {
         }
     );
     } catch (error) {
+        // if the password is wrong or the email does not exist then send an error msg to the user
+        if (error.name === 'InvalidCredentialsError' || error.name === 'UserNotFoundError') {
+            return res.status(400).json({ message: error.message });
+        }
         console.error('Error logging in:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
