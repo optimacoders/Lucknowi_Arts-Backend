@@ -1,9 +1,10 @@
 const express = require('express');
 const mongoose = require("mongoose")
-const user = require("./Models/Usermodel")
+// const user = require("./Models/Usermodel")
 const productrouter = require("./Routers/ProductRouter");
 const dotenv = require('dotenv');
 const auth = require("./Routers/AuthRouter")
+const orders = require("./Routers/OrderRoute")
 
 const app = express();
 
@@ -17,7 +18,8 @@ app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
 app.use("/admin", productrouter)
-// app.use("/authi", auth)
+app.use("/auth/", auth)
+app.use("/order/", orders)
 
 
 

@@ -1,14 +1,14 @@
 const mongoose = require("mongoose");
 
 const UserSchema = mongoose.Schema({
-    
+
     name: {
         type: String,
         required: true,
     },
     address: {
         type: String,
-        
+
     },
     mobileNo: {
         type: Number,
@@ -24,11 +24,13 @@ const UserSchema = mongoose.Schema({
         type: String,
         required: true,
     },
-    userType: {
+    userType: { 
         type: String,
-        required: true,
+        enum: ['normal', 'admin'],
+        default: 'normal',
+        required: true
     }
-   
+
 
 });
 
