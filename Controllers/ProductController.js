@@ -1,10 +1,10 @@
 const express = require('express');
 const Productmodel = require("../Models/Productmodel");
-const cloudinary = require('../Utils/imageupload')
 
 const addproduct = async (req, res) => {
     try { 
         const { title, description, quantity, original_price, selling_price, image, category, size, color, video, material } = req.body;
+        console.log(title)
         const product = new Productmodel({
             title,
             description,
@@ -18,9 +18,7 @@ const addproduct = async (req, res) => {
             video,
             material
         });
-        console.log("dd",product)
-        const imageUrl = await cloudinary.uploader.upload(image);
-        console.log("imageUrl", imageUrl);
+
         await product.save();
         return res.status(201).send({
             status: true,
@@ -36,4 +34,28 @@ const addproduct = async (req, res) => {
     }
 }
 
-module.exports = { addproduct };
+
+const getProducts = async (req, res) => {
+    try {
+        let products;
+        if (req.query.category !== undefined) {
+            let category = req.query.category;
+            products = await Productmodel.find({ category: category });
+        } else {
+            products = await Productmodel.find({});
+        }
+        return res.status(200).json({
+            status: true,
+            message: "Products fetched successfully",
+            products: products
+        });
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        return res.status(500).json({
+            status: false,
+            message: "Error fetching products"
+        });
+    }
+}
+
+module.exports = { addproduct,getProducts };
