@@ -19,7 +19,7 @@ router.get('/:orderId', [
     param('orderId').isMongoId()
 ], getOrderById);
 
-// Update Order Status API
+
 router.put('/:orderId/status', [
     param('orderId').isMongoId(),
     body('status').isIn(['Preparing', 'Shipment', 'Completed'])
