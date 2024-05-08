@@ -58,4 +58,19 @@ const getProducts = async (req, res) => {
     }
 }
 
-module.exports = { addproduct,getProducts };
+
+const getProductById=async(req,res)=>{
+try {
+    const{id}=req.params;
+    const product=await Productmodel.findById(id);
+    return res.status(200).json({
+        status: true,
+        message: "Product fetched successfully",
+        products: product
+    });
+} catch (error) {
+    
+}
+}
+
+module.exports = { addproduct,getProducts ,getProductById};

@@ -2,22 +2,26 @@ const express = require('express');
 const mongoose = require("mongoose")
 const productrouter = require("./Routers/ProductRouter");
 const dotenv = require('dotenv');
-
+const cors =require("cors")
 const auth = require("./Routers/AuthRouter")
 const orders = require("./Routers/OrderRoute")
 const category=require("./Routers/CategoryRouter")
-
+const cart =require("./Routers/CartRouter")
 const app = express();
 
 
 dotenv.config();
 app.use(express.json());
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
+app.use(cors({
+  origin: "*"
+}))
 
 app.use("/admin/product", productrouter)
 app.use("/auth/", auth)
 app.use("/order/", orders)
 app.use("/admin/category",category )
+app.use("/cart/", cart)
 
 
 
