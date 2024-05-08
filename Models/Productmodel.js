@@ -22,21 +22,21 @@ const ProductSchema = mongoose.Schema({
         required: true,
     },
     image: {
-        type: [String],
+        type: String,
         required: true,
     },
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category'         
     },
-    size: {
+    size: [{
         type: String,
         required: true,
-    },
-    color:{
+    }],
+    color: [{
         type: String,
         required: true,
-    },
+    }],
     video:{
         type:String
     },
