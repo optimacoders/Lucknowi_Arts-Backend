@@ -1,5 +1,23 @@
 const mongoose = require("mongoose");
 
+const ProductSchema = mongoose.Schema({
+    product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product'         
+    },
+    quantity: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    color:{
+        type:String
+    },
+    size:{
+        type:String
+    }
+});
+
 const UserSchema = mongoose.Schema({
 
     name: {
@@ -29,7 +47,7 @@ const UserSchema = mongoose.Schema({
         enum: ['normal', 'admin'],
         default: 'normal',
         required: true
-    }
+    },cart: [ProductSchema]
 
 
 });

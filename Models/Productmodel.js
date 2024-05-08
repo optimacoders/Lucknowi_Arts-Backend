@@ -26,17 +26,17 @@ const ProductSchema = mongoose.Schema({
         required: true,
     },
     category: {
-        type: String,
-        required: true,          // have to add relation with category
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category'         
     },
-    size: {
-        type: String,
-        required: true,
-    },
-    color:{
+    size: [{
         type: String,
         required: true,
-    },
+    }],
+    color: [{
+        type: String,
+        required: true,
+    }],
     video:{
         type:String
     },

@@ -1,15 +1,18 @@
 const express = require('express');
 const Productmodel = require("../Models/Productmodel");
-const cloudinary = require('../Utils/imageupload')
 
 const addproduct = async (req, res) => {
     try { 
         console.log(req)
         const { title, description, quantity, original_price, selling_price, image, category, size, color, video, material } = req.body;
+<<<<<<< HEAD
         console.log(title,image);
         const imageUrl = await cloudinary.uploader.upload(image);
         console.log("dd",product)
         console.log("imageUrl", imageUrl);
+=======
+        console.log(title)
+>>>>>>> b92fa63bc7c2b4f0558fdf4c9cbf870f19a980dd
         const product = new Productmodel({
             title,
             description,
@@ -23,6 +26,10 @@ const addproduct = async (req, res) => {
             video,
             material
         });
+<<<<<<< HEAD
+=======
+
+>>>>>>> b92fa63bc7c2b4f0558fdf4c9cbf870f19a980dd
         await product.save();
         return res.status(201).send({
             status: true,
@@ -38,4 +45,43 @@ const addproduct = async (req, res) => {
     }
 }
 
-module.exports = { addproduct };
+
+const getProducts = async (req, res) => {
+    try {
+        let products;
+        if (req.query.category !== undefined) {
+            let category = req.query.category;
+            products = await Productmodel.find({ category: category });
+        } else {
+            products = await Productmodel.find({});
+        }
+        return res.status(200).json({
+            status: true,
+            message: "Products fetched successfully",
+            products: products
+        });
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        return res.status(500).json({
+            status: false,
+            message: "Error fetching products"
+        });
+    }
+}
+
+
+const getProductById=async(req,res)=>{
+try {
+    const{id}=req.params;
+    const product=await Productmodel.findById(id);
+    return res.status(200).json({
+        status: true,
+        message: "Product fetched successfully",
+        products: product
+    });
+} catch (error) {
+    
+}
+}
+
+module.exports = { addproduct,getProducts ,getProductById};
