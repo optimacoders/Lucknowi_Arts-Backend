@@ -5,6 +5,7 @@ const productrouter = require("./Routers/ProductRouter");
 const dotenv = require('dotenv');
 const auth = require("./Routers/AuthRouter")
 const orders = require("./Routers/OrderRoute")
+const payment = require("./Routers/PaymentRoute")
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ limit: '100mb', extended: true }));
 app.use("/admin", productrouter)
 app.use("/auth/", auth)
 app.use("/order/", orders)
+app.use("/pay", payment)
 
 
 
