@@ -45,7 +45,7 @@ app.use("/cart/", cart)
 
 
 
-const cloudinary = require('./Utils/imageupload')
+
 
 const mongoDB = process.env.MONGODB_URL;
 mongoose.connect(mongoDB)
@@ -58,19 +58,7 @@ mongoose.connect(mongoDB)
 
 
 
-app.post("/Image", async (req, res) => {
-  try {
-    const result = await cloudinary.uploader.upload(req.body.image);
-    console.log(result);
-    return res.status(200).json({ result });
-  }
-  catch (err) {
-    console.log(err);
-    return res.status(400).json({
-      err
-    })
-  }
-});
+
 const PORT = process.env.PORT || 9000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
