@@ -26,4 +26,22 @@ const addCategory = async (req, res) => {
     }
 }
 
-module.exports = { addCategory };
+const getAllCategories = async (req, res) => {
+    try {
+        const categories = await CategoryModel.find();
+        
+        return res.status(200).send({
+            status: true,
+            categories
+        });
+    } catch (error) {
+        console.error("Error fetching categories:", error);
+        return res.status(500).send({
+            status: false,
+            message: "Error fetching categories"
+        });
+    }
+}
+
+
+module.exports = { addCategory,getAllCategories };
