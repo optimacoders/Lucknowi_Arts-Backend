@@ -1,12 +1,12 @@
-// orderRoutes.js
-
 const express = require('express');
 const router = express.Router();
-const { body, param } = require('express-validator');
-const { addCategory, getAllCategories } = require('../Controllers/CategoryController');
+const { addCategory, getAllCategories, deleteCategory, editCategory } = require('../Controllers/CategoryController');
+const verifyToken = require('../Middleware/Authenticating');
 
+router.post("/add-category", verifyToken, addCategory);
+router.get("/", verifyToken, getAllCategories);
 
+router.delete("/delete-category/:id", verifyToken, deleteCategory);
+router.put("/edit-category/:id", verifyToken, editCategory);
 
-router.post("/add-category",addCategory)
-router.get("/",getAllCategories)
 module.exports = router;

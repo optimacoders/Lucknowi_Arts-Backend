@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 
-const CategorySchema = mongoose.Schema({
+const ColorSchema = mongoose.Schema({
     name: {
         type: String,
         required: true,
     },
-    image: {
+    colorCode: {
         type: String,
         required: true
     },
@@ -15,6 +15,6 @@ const CategorySchema = mongoose.Schema({
     }
 });
 
-const CategoryModel = mongoose.model("Category", CategorySchema);
+const ColorModel = mongoose.model("Color", ColorSchema);
 
-module.exports = CategoryModel;
+module.exports = ColorModel;

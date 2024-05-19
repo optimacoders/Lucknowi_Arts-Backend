@@ -5,8 +5,7 @@ const dotenv = require("dotenv")
 dotenv.config();
 const jwt_key = process.env.JWT_SECRET;
 const verifyToken = (req, res, next) => {
-    let token = req.headers['authentication']
-    console.log(token);
+    let token = req.headers.authorization
     if (!token) {
         return res.status(401).json({
             data: { status: false, msg: "Unauthorized - No token" }
