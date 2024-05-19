@@ -3,12 +3,12 @@ const dotenv = require('dotenv');
 const Payment = require("../Models/Paymentmodel")
 const crypto = require("crypto");
 dotenv.config();
-// const { instance } = require("../server");
+
+
 const instance = new Razorpay({
     key_id: process.env.RAZORPAY_KEY,
     key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
-console.log(instance.orders)
 
 const checkout = async (req, res) => {
     const { amount } = req.body;
@@ -23,7 +23,6 @@ const checkout = async (req, res) => {
             order
         });
     } catch (error) {
-        console.error("Error creating order:", error);
         return res.status(500).send({
             success: false,
             message: "Failed to create order"
@@ -34,6 +33,7 @@ const checkout = async (req, res) => {
 const paymentVerification = async (req, res) => {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
+    
     const body = razorpay_order_id + "|" + razorpay_payment_id;
 
     const expectedSignature = crypto
@@ -50,6 +50,7 @@ const paymentVerification = async (req, res) => {
             razorpay_payment_id,
             razorpay_signature,
         });
+
         res.redirect(
             `http://localhost:3000/paymentsuccess?reference=${razorpay_payment_id}`
         );
