@@ -10,6 +10,7 @@ const category = require("./Routers/CategoryRouter")
 const cart = require("./Routers/CartRouter")
 const payment = require("./Routers/PaymentRouter")
 const Razorpay = require('razorpay');
+const AdminUser = require("./Admin/Routes/userRoute")
 
 const app = express();
 
@@ -26,9 +27,10 @@ app.use("/order/", orders)
 
 app.use("/pay", payment)
 
-app.use("/admin/category",category )
+app.use("/admin/category", category)
 app.use("/cart/", cart)
 app.use("/payment", payment)
+app.use("/admin/user", AdminUser)
 
 // const instance = new Razorpay({
 //   key_id: process.env.RAZORPAY_KEY,
