@@ -59,7 +59,7 @@ const signup = async (req, res) => {
                     console.error('Error generating JWT token:', err);
                     return res.status(500).json({ error: 'Internal server error' });
                 }
-                res.status(201).json({ message: 'User registered successfully', token });
+                res.status(201).json({ status: true, message: 'User registered successfully', token });
             }
         );
     } catch (error) {
@@ -71,37 +71,37 @@ const signup = async (req, res) => {
 const login = async (req, res) => {
     try {
         // create login function
-    const email = req.body.email;
-    const password = req.body.password;
+        const email = req.body.email;
+        const password = req.body.password;
 
-    const user = await Usermodel.findOne({ email });
-    if (!user) {
-        return res.status(400).json({ message: 'User not found' });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-        return res.status(400).json({ message: 'Invalid credentials' });
-    }
-
-    const payload = {
-        user: {
-            id: user.id,
-        },
-    };  
-    
-    const jwtSecret = process.env.JWT_SECRET;
-    jwt.sign(
-        payload,
-        jwtSecret,
-        (err, token) => {
-            if (err) {
-                console.error('Error generating JWT token:', err);
-                return res.status(500).json({ error: 'Internal server error' });
-            }
-            res.status(200).json({ message: 'User logged in successfully', token });
+        const user = await Usermodel.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: 'User not found' });
         }
-    );
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Invalid credentials' });
+        }
+
+        const payload = {
+            user: {
+                id: user.id,
+            },
+        };
+
+        const jwtSecret = process.env.JWT_SECRET;
+        jwt.sign(
+            payload,
+            jwtSecret,
+            (err, token) => {
+                if (err) {
+                    console.error('Error generating JWT token:', err);
+                    return res.status(500).json({ error: 'Internal server error' });
+                }
+                res.status(200).json({ status: true, message: 'User logged in successfully', token });
+            }
+        );
     } catch (error) {
         // if the password is wrong or the email does not exist then send an error msg to the user
         if (error.name === 'InvalidCredentialsError' || error.name === 'UserNotFoundError') {

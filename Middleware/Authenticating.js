@@ -1,36 +1,32 @@
 const jwt = require('jsonwebtoken');
-const User = require('../Model/Auth');
+const User = require('../Models/Usermodel');
+const dotenv = require("dotenv")
 
-
-const authenticateToken = async (req, res, next) => {
-    const token = req.header('Authorization');
-
+dotenv.config();
+const jwt_key = process.env.JWT_SECRET;
+const verifyToken = (req, res, next) => {
+    let token = req.headers.authorization
     if (!token) {
-        return res.status(401).json({ message: 'Access denied. No token provided.' });
+        return res.status(401).json({
+            data: { status: false, msg: "Unauthorized - No token" }
+        })
     }
 
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded.user;
-
-        // Check if the user exists in the database
-        const user = await User.findById(req.user.id);
-        if (!user) {
-            return res.status(401).json({ message: 'Invalid token. User not found.' });
-        }
-
-        // Check if the user has admin access by searching for any user with authenticator as "admin"
-        const adminUser = await User.findOne({ authenticator: "admin" });
-        if (adminUser && adminUser._id.equals(user._id)) {
-            req.user.adminAccess = true;
+    token = token.split(' ')[1];
+    jwt.verify(token, jwt_key, async (err, valid) => {
+        if (err) {
+            return res.status(401).json({
+                data: { status: false, msg: "Unauthorized - Invalid Token" }
+            })
         } else {
-            req.user.adminAccess = false;
+            const user = await User.findById(valid.user.id);
+            if (!user) {
+                return res.status(401).json({ message: 'Invalid token. User not found.' });
+            }
+            req.user = user;
+            next();
         }
+    })
+}
 
-        next();
-    } catch (error) {
-        return res.status(401).json({ message: 'Invalid token.' });
-    }
-};
-
-module.exports = authenticateToken;
+module.exports = verifyToken;

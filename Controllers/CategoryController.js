@@ -28,8 +28,8 @@ const addCategory = async (req, res) => {
 
 const getAllCategories = async (req, res) => {
     try {
-        const categories = await CategoryModel.find();
-        
+        const categories = await CategoryModel.find().sort({ createdAt: -1 });;
+
         return res.status(200).send({
             status: true,
             categories
@@ -43,5 +43,64 @@ const getAllCategories = async (req, res) => {
     }
 }
 
+const deleteCategory = async (req, res) => {
+    try {
+        const { id } = req.params;
 
-module.exports = { addCategory,getAllCategories };
+        const category = await CategoryModel.findByIdAndDelete(id);
+
+        if (!category) {
+            return res.status(404).send({
+                status: false,
+                message: "Category not found"
+            });
+        }
+
+        return res.status(200).send({
+            status: true,
+            message: "Category deleted successfully"
+        });
+    } catch (error) {
+        console.error("Error deleting category:", error);
+        return res.status(500).send({
+            status: false,
+            message: "Error deleting category"
+        });
+    }
+}
+
+
+const editCategory = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, image } = req.body;
+
+        const category = await CategoryModel.findByIdAndUpdate(
+            id,
+            { name, image },
+        );
+
+        if (!category) {
+            return res.status(404).send({
+                status: false,
+                message: "Category not found"
+            });
+        }
+
+        return res.status(200).send({
+            status: true,
+            message: "Category updated successfully",
+            category: category
+        });
+    } catch (error) {
+        console.error("Error updating category:", error);
+        return res.status(500).send({
+            status: false,
+            message: "Error updating category"
+        });
+    }
+}
+
+
+
+module.exports = { addCategory, getAllCategories, deleteCategory, editCategory };
