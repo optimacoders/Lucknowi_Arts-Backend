@@ -21,7 +21,7 @@ app.use(cors({
   origin: "*"
 }))
 
-app.use("/admin", productrouter)
+app.use("/admin/product", productrouter)
 app.use("/auth/", auth)
 app.use("/order/", orders)
 

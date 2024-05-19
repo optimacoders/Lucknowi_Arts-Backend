@@ -1,78 +1,52 @@
 const Order = require('../Models/OrderModel');
-const { validationResult } = require('express-validator');
+const Usermodel = require('../Models/Usermodel');
 
-// Create Order API
+
 const createOrder = async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
+        const { userId, address, phoneNo, orderValue, razorpay_order_id, razorpay_payment_id } = req.body;
+        const user = await Usermodel.findById(userId);
+        const cart = user.cart;
+
+        const createdOrders = [];
+        for (const cartItem of cart) {
+            const { product, quantity, color, size } = cartItem;
+
+            const order = new Order({
+                userId,
+                productId:product,
+                quantity,
+                color,
+                size,
+                address,
+                phoneNo,
+                orderValue,
+                razorpay_order_id,
+                razorpay_payment_id
+            });
+            await order.save();
+            createdOrders.push(order);
         }
 
-        const { userId, productIds, address, phoneNo, orderValue } = req.body;
+        user.cart = [];
+        await user.save();
 
-        // Find the latest order and get its orderId
-        const latestOrder = await Order.findOne().sort({ orderId: -1 });
-
-        let orderId;
-        if (latestOrder) {
-            // If there are existing orders, increment the orderId by 1
-            orderId = latestOrder.orderId + 1;
-        } else {
-            // If there are no existing orders, start orderId from 1000
-            orderId = 1000;
-        }
-
-        // Create a new order
-        const order = new Order({
-            orderId,
-            userId,
-            productIds,
-            address,
-            phoneNo,
-            orderValue
-        });
-
-        await order.save();
-
-        res.status(201).json({ message: 'Order created successfully', order });
+        res.status(201).json({ status: true, message: 'Orders created successfully', orders: createdOrders });
     } catch (error) {
-        console.error('Error creating order:', error);
+        console.error('Error creating orders:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
 
-// Get Order by ID API
-const getOrderById = async (req, res) => {
-    try {
-        const orderId = req.params.orderId;
 
-        const order = await Order.findById(orderId);
-        if (!order) {
-            return res.status(404).json({ message: 'Order not found' });
-        }
-
-        res.status(200).json({ order });
-        if (typeof orderId === 'string' && orderId.toLowerCase() === 'getallorders') {
-            const orders = await Order.find({});
-            return res.status(200).json({ orders });
-        }
-        console.error('Error retrieving order by ID:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-    catch (error) {
-        console.error('Error retrieving order by ID:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-};
 
 // Update Order Status API
 const updateOrderStatus = async (req, res) => {
     try {
-        const orderId = req.params.orderId;
+        const orderId = req.params.id;
         const { status } = req.body;
 
-        const order = await Order.findByIdAndUpdate(orderId, { status }, { new: true });
+        const order = await Order.findByIdAndUpdate(_id, { status }, { new: true });
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
         }
@@ -84,12 +58,12 @@ const updateOrderStatus = async (req, res) => {
     }
 };
 
-// Get Orders by User ID API
+
 const getOrdersByUserId = async (req, res) => {
     try {
         const userId = req.params.userId;
 
-        const orders = await Order.find({ userId });
+        const orders = await Order.find({ userId }).populate("productId");
         res.status(200).json({ orders });
     } catch (error) {
         console.error('Error retrieving orders by user ID:', error);
@@ -97,7 +71,7 @@ const getOrdersByUserId = async (req, res) => {
     }
 };
 
-// Get All Orders API
+
 const getAllOrders = async (req, res) => {
     try {
         const orders = await Order.find();
@@ -108,4 +82,4 @@ const getAllOrders = async (req, res) => {
     }
 };
 
-module.exports = { createOrder, getOrderById, updateOrderStatus, getOrdersByUserId, getAllOrders };
+module.exports = { createOrder, updateOrderStatus, getOrdersByUserId, getAllOrders };

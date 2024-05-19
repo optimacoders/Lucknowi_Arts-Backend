@@ -1,20 +1,27 @@
 const mongoose = require("mongoose");
 
 const orderSchema = mongoose.Schema({
-    orderId: {
-        type: Number,
-        required: true,
-        unique: true
-    },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', // Reference to the User model
+        ref: 'User', 
         required: true
     },
-    productIds: [{
+    productId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product' // Reference to the Product model
-    }],
+        ref: 'Product',
+        required: true
+    },
+    quantity: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    color:{
+        type: String
+    },
+    size:{
+        type: String
+    },
     address: {
         type: String,
         required: true
@@ -25,7 +32,7 @@ const orderSchema = mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['Preparing', 'Shipment', 'Completed'],
+        enum: ['Pending', 'Shipment', 'Completed'],
         default: 'Preparing'
     },
     orderDateTime: {
@@ -35,6 +42,16 @@ const orderSchema = mongoose.Schema({
     orderValue: {
         type: Number,
         required: true
+    },
+    paymentStatus: { 
+        type: String, 
+        default: 'pending' 
+    },
+    razorpay_order_id:{
+        type: String,
+    },
+    razorpay_payment_id:{
+        type: String,
     }
 });
 
