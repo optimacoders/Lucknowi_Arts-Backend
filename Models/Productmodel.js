@@ -27,7 +27,7 @@ const ProductSchema = mongoose.Schema({
     },
     category: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Category'         
+        ref: 'Category'
     },
     size: [{
         type: String,
@@ -37,12 +37,16 @@ const ProductSchema = mongoose.Schema({
         type: String,
         required: true,
     }],
-    video:{
-        type:String
+    video: {
+        type: String
     },
-    material:{
-        type:String
-    }  
+    material: {
+        type: String
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
 });
 
 const Productmodel = mongoose.model("Product", ProductSchema);

@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const Usermodel = require('../../Models/Usermodel');
 const jwt = require('jsonwebtoken');
+const applyPagination = require('../../utils/dataUtils');
 
 const addAdminUser = async (req, res) => {
     const { name, password, email, mobileNo } = req.body;
@@ -32,8 +33,21 @@ const addAdminUser = async (req, res) => {
 
 const getAllAdminUsers = async (req, res) => {
     try {
-        const adminUsers = await Usermodel.find({ userType: 'admin' });
-        return res.status(200).json({ status: true, data: adminUsers });
+        const page = parseInt(req.query.page) || 1;
+        const searchQuery = req.query.q || "";
+
+        let filter = { userType: 'admin' };
+        if (searchQuery) {
+            filter.$or = [
+                { email: { $regex: searchQuery, $options: 'i' } },
+                { name: { $regex: searchQuery, $options: 'i' } }
+            ];
+        }
+
+        const adminUsers = await Usermodel.find(filter).sort({ createdAt: -1 });
+        console.log(adminUsers);
+        const paginatedData = applyPagination(adminUsers, page)
+        return res.status(200).json({ status: true, response: paginatedData });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ status: false, message: 'Internal server error' });

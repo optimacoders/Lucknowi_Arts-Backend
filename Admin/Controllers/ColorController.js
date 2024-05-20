@@ -1,13 +1,29 @@
 const ColorModal = require("../../Models/ColorsModel");
+const applyPagination = require("../../utils/dataUtils");
 
 const getAllColors = async (req, res) => {
     try {
-        const color = await ColorModal.find().sort({ createdAt: -1 });
+        const page = req.query.page || 1;
+        const searchQuery = req.query.q || "";
+
+        let filter = {};
+        if (searchQuery) {
+            filter = {
+                $or: [
+                    { name: { $regex: searchQuery, $options: 'i' } },
+                    { colorCode: { $regex: searchQuery, $options: 'i' } }
+                ]
+            };
+        }
+
+        const color = await ColorModal.find(filter).sort({ createdAt: -1 });
+        const paginatedData = applyPagination(color, page)
         return res.status(200).json({
             status: true,
             message: "Data fetched successfully.",
-            response: color
+            response: paginatedData
         });
+
     } catch (error) {
         console.error("Error fetching sizes:", error);
         return res.status(500).send({
