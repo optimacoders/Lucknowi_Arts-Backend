@@ -1,11 +1,23 @@
 const SizeModel = require("../../Models/SizeModel");
+const applyPagination = require("../../utils/dataUtils");
 
 const getAllSizes = async (req, res) => {
     try {
-        const sizes = await SizeModel.find().sort({ createdAt: -1 });
+        const page = req.query.page || 1;
+        const searchQuery = req.query.q || "";
+
+        let filter = {};
+        if (searchQuery) {
+            filter = {
+                size: { $regex: searchQuery, $options: 'i' }
+            };
+        }
+
+        const sizes = await SizeModel.find(filter).sort({ createdAt: -1 });
+        const paginatedData = applyPagination(sizes, page)
         return res.status(200).json({
             status: true,
-            response: sizes
+            response: paginatedData
         });
     } catch (error) {
         console.error("Error fetching sizes:", error);

@@ -1,5 +1,7 @@
 const { validationResult } = require('express-validator');
 const CategoryModel = require('../Models/CategoryModel');
+const applyPagination = require('../utils/dataUtils');
+const { response } = require('express');
 
 const addCategory = async (req, res) => {
     try {
@@ -28,11 +30,22 @@ const addCategory = async (req, res) => {
 
 const getAllCategories = async (req, res) => {
     try {
-        const categories = await CategoryModel.find().sort({ createdAt: -1 });;
+        const page = req.query.page || 1;
+        const searchQuery = req.query.q || "";
 
+        let filter = {};
+        if (searchQuery) {
+            filter = {
+                name: { $regex: searchQuery, $options: 'i' }
+            };
+        }
+
+        const categories = await CategoryModel.find(filter).sort({ createdAt: -1 });
+
+        const paginatedData = applyPagination(categories, page)
         return res.status(200).send({
             status: true,
-            categories
+            response: paginatedData
         });
     } catch (error) {
         console.error("Error fetching categories:", error);
@@ -75,9 +88,15 @@ const editCategory = async (req, res) => {
         const { id } = req.params;
         const { name, image } = req.body;
 
+        const updateData = { name };
+        if (image) {
+            updateData.image = image;
+        }
+
         const category = await CategoryModel.findByIdAndUpdate(
             id,
-            { name, image },
+            updateData,
+            { new: true }
         );
 
         if (!category) {
@@ -101,6 +120,31 @@ const editCategory = async (req, res) => {
     }
 }
 
+const getCategoryById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const category = await CategoryModel.findById(id);
+
+        if (!category) {
+            return res.status(404).send({
+                status: false,
+                message: "Category not found"
+            });
+        }
+
+        return res.status(200).send({
+            status: true,
+            response: category
+        });
+    } catch (error) {
+        console.error("Error fetching category:", error);
+        return res.status(500).send({
+            status: false,
+            message: "Error fetching category"
+        });
+    }
+}
 
 
-module.exports = { addCategory, getAllCategories, deleteCategory, editCategory };
+
+module.exports = { addCategory, getAllCategories, deleteCategory, editCategory, getCategoryById };
