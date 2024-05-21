@@ -4,7 +4,7 @@ const Usermodel = require('../Models/Usermodel');
 
 const createOrder = async (req, res) => {
     try {
-        const { userId, address, phoneNo, orderValue, razorpay_order_id, razorpay_payment_id } = req.body;
+        const { userId, address, phoneNo, orderValue, razorpay_order_id, razorpay_payment_id,paymentStatus } = req.body;
         const user = await Usermodel.findById(userId);
         const cart = user.cart;
 
@@ -22,7 +22,8 @@ const createOrder = async (req, res) => {
                 phoneNo,
                 orderValue,
                 razorpay_order_id,
-                razorpay_payment_id
+                razorpay_payment_id,
+                paymentStatus
             });
             await order.save();
             createdOrders.push(order);

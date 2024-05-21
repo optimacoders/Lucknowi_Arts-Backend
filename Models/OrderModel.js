@@ -33,7 +33,7 @@ const orderSchema = mongoose.Schema({
     status: {
         type: String,
         enum: ['Pending', 'Shipment', 'Completed'],
-        default: 'Preparing'
+        default: 'Pending'
     },
     orderDateTime: {
         type: Date,
@@ -52,7 +52,9 @@ const orderSchema = mongoose.Schema({
     },
     razorpay_payment_id:{
         type: String,
-    }
+    }, Delivery: {
+        type: Date,
+    },
 });
 
 const Order = mongoose.model("Order", orderSchema);
