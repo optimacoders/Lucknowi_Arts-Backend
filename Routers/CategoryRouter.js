@@ -4,7 +4,7 @@ const { addCategory, getAllCategories, deleteCategory, editCategory, getCategory
 const verifyToken = require('../Middleware/Authenticating');
 
 router.post("/add-category", verifyToken, addCategory);
-router.get("/", verifyToken, getAllCategories);
+router.get("/", getAllCategories);
 router.get("/:id", verifyToken, getCategoryById);
 
 router.delete("/delete-category/:id", verifyToken, deleteCategory);

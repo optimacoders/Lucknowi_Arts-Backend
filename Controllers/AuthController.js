@@ -70,7 +70,7 @@ const signup = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-        // create login function
+      
         const email = req.body.email;
         const password = req.body.password;
 
@@ -112,4 +112,61 @@ const login = async (req, res) => {
     }
 };
 
-module.exports = { signup, login };
+
+
+const getuserDetails=async(req,res)=>{
+try {
+    const user = req.user;
+    const userdetails=await Usermodel.findById(user.id)
+    return res.status(200).send({
+        status: true,
+        message:"user details fetched succesfully",
+        userdetails
+    });
+} catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+    
+}
+
+
+}
+
+
+const editUserDetails = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { data } = req.body;
+        const { name, email, mobileNo, address } = data;
+
+        const updatedUser = await Usermodel.findByIdAndUpdate(userId, {
+            name: name,
+            email: email, 
+            mobileNo: mobileNo,
+            address: address
+        }, { new: true });
+
+        if (updatedUser) {
+            return res.status(200).send({
+                status: true,
+                message: "User details updated successfully",
+                updatedUser
+            });
+        } else {
+            return res.status(404).send({
+                status: false,
+                message: "User not found or details not updated"
+            });
+        }
+    } catch (error) {
+        console.error('Error editing user details:', error);
+        return res.status(500).send({
+            status: false,
+            message: "Internal server error"
+        });
+    }
+};
+
+
+
+
+module.exports = { signup, login ,getuserDetails,editUserDetails};

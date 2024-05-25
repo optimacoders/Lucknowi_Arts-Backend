@@ -4,12 +4,13 @@ const Usermodel = require("../Models/Usermodel");
 
 const addtoCart = async (req, res) => {
     try {
-        const { userId, productId, quantity,color,size } = req.body;
-        const user = await Usermodel.findById(userId);
+        const { productId, quantity,color,size } = req.body;
+        const userid=req.user._id
+        const user = await Usermodel.findById(userid);
         if (!user) {
             return res.status(404).send({ error: 'User not found' });
         }
-        const existingProductIndex = user.cart.findIndex(item => item.product.toString() === productId);
+        const existingProductIndex = user.cart.findIndex(item => item?.product?.toString() === productId);
 
         if (existingProductIndex !== -1) {
             user.cart[existingProductIndex].color = color;
@@ -42,8 +43,9 @@ const addtoCart = async (req, res) => {
 
 const getUserCart = async (req, res) => {
     try {
-        const { userId } = req.params;
+        const userId  = req.user._id
         const user = await Usermodel.findById(userId);
+        console.log(user)
         await user.populate('cart.product'); 
 
         return res.status(200).send({
@@ -61,7 +63,7 @@ const getUserCart = async (req, res) => {
 const removeProduct=async(req,res)=>{
     try {
        const {productId}=req.params;
-       const {userId}=req.body
+       const userId=req.user._id
        const user=await Usermodel.findById(userId)
 
        const index = user.cart.findIndex(item => item.productId === productId);
@@ -83,7 +85,8 @@ const removeProduct=async(req,res)=>{
 const editCart= async(req,res)=>{
     try {
         const {productId}=req.params;
-        const {userId,quantity}=req.body
+        const {quantity}=req.body
+        const userId=req.user._id
         const user=await Usermodel.findById(userId)
 
         const productIndex = user.cart.findIndex(item => item.product.toString() === productId);
