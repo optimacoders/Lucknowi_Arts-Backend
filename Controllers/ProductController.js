@@ -82,5 +82,19 @@ const getProductById = async (req, res) => {
     }
 }
 
+const getSimilarProducts=async(req,res)=>{
+  try {
+    const categoryid=req.params.category;
+    const products = await Productmodel.find({category:categoryid});
+    return res.status(200).json({
+        status: true,
+        message: "Similar products fetched successfully",
+        products
+    });
 
-module.exports = { addproduct, getProducts, getProductById };
+  } catch (error) {
+    
+  }
+}
+
+module.exports = { addproduct, getProducts, getProductById,getSimilarProducts };

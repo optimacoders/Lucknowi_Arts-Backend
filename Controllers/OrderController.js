@@ -83,4 +83,15 @@ const getAllOrders = async (req, res) => {
     }
 };
 
-module.exports = { createOrder, updateOrderStatus, getOrdersByUserId, getAllOrders };
+
+const getmyOrder = async (req, res) => {
+    try {
+        const orderid=req.params.orderid
+        const order = await Order.findById(orderid).populate("productId");
+        res.status(200).json({ order });
+    } catch (error) {
+        console.error('Error retrieving all orders:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+module.exports = { createOrder, updateOrderStatus, getOrdersByUserId, getAllOrders ,getmyOrder};
