@@ -70,18 +70,18 @@ const signup = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-      
+
         const email = req.body.email;
         const password = req.body.password;
 
         const user = await Usermodel.findOne({ email });
         if (!user) {
-            return res.status(400).json({ message: 'User not found' });
+            return res.status(400).json({ message: 'email or password is invalid.' });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(400).json({ message: 'Invalid credentials' });
+            return res.status(400).json({ message: 'email or password is invalid.' });
         }
 
         const payload = {
@@ -114,19 +114,19 @@ const login = async (req, res) => {
 
 
 
-const getuserDetails=async(req,res)=>{
-try {
-    const user = req.user;
-    const userdetails=await Usermodel.findById(user.id)
-    return res.status(200).send({
-        status: true,
-        message:"user details fetched succesfully",
-        userdetails
-    });
-} catch (error) {
-    res.status(500).json({ error: 'Internal server error' });
-    
-}
+const getuserDetails = async (req, res) => {
+    try {
+        const user = req.user;
+        const userdetails = await Usermodel.findById(user.id)
+        return res.status(200).send({
+            status: true,
+            message: "user details fetched succesfully",
+            userdetails
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+
+    }
 
 
 }
@@ -140,7 +140,7 @@ const editUserDetails = async (req, res) => {
 
         const updatedUser = await Usermodel.findByIdAndUpdate(userId, {
             name: name,
-            email: email, 
+            email: email,
             mobileNo: mobileNo,
             address: address
         }, { new: true });
@@ -169,4 +169,4 @@ const editUserDetails = async (req, res) => {
 
 
 
-module.exports = { signup, login ,getuserDetails,editUserDetails};
+module.exports = { signup, login, getuserDetails, editUserDetails };
