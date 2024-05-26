@@ -38,21 +38,28 @@ const addproduct = async (req, res) => {
 const getProducts = async (req, res) => {
     try {
         const page = req.query.page || 1;
-        let products;
-        if (req.query.category !== undefined) {
-            let category = req.query.category;
-            products = await Productmodel.find({ category: category }).sort({ createdAt: -1 }).populate('category');
-        } else {
-            products = await Productmodel.find({}).sort({ createdAt: -1 }).populate('category');
+        const searchQuery = req.query.q || "";
+        const category = req.query.category;
+
+        let filter = {};
+
+        if (searchQuery) {
+            filter.title = { $regex: searchQuery, $options: 'i' };
         }
-        console.log(products)
-        const paginatedData = applyPagination(products, page)
+
+        if (category !== undefined) {
+            filter.category = category;
+        }
+
+        const products = await Productmodel.find(filter).sort({ createdAt: -1 }).populate('category');
+
+        console.log(products);
+        const paginatedData = applyPagination(products, page);
         return res.status(200).json({
             status: true,
-            message: "Products fetched ",
+            message: "Products fetched",
             products: paginatedData
         });
-
 
     } catch (error) {
         console.error("Error fetching products:", error);
@@ -61,7 +68,8 @@ const getProducts = async (req, res) => {
             message: "Error fetching products"
         });
     }
-}
+};
+
 
 
 const getProductById = async (req, res) => {
@@ -82,19 +90,91 @@ const getProductById = async (req, res) => {
     }
 }
 
-const getSimilarProducts=async(req,res)=>{
-  try {
-    const categoryid=req.params.category;
-    const products = await Productmodel.find({category:categoryid});
-    return res.status(200).json({
-        status: true,
-        message: "Similar products fetched successfully",
-        products
-    });
+const getSimilarProducts = async (req, res) => {
+    try {
+        const categoryid = req.params.category;
+        const products = await Productmodel.find({ category: categoryid });
+        return res.status(200).json({
+            status: true,
+            message: "Similar products fetched successfully",
+            products
+        });
 
-  } catch (error) {
-    
-  }
+    } catch (error) {
+
+    }
 }
 
-module.exports = { addproduct, getProducts, getProductById,getSimilarProducts };
+const editProduct = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title, description, quantity, original_price, selling_price, image, category, size, color, video } = req.body;
+
+        const updateData = {};
+        if (title) updateData.title = title;
+        if (description) updateData.description = description;
+        if (quantity) updateData.quantity = quantity;
+        if (original_price) updateData.original_price = original_price;
+        if (selling_price) updateData.selling_price = selling_price;
+        if (image) updateData.image = image;
+        if (category) updateData.category = category;
+        if (size) updateData.size = size;
+        if (color) updateData.color = color;
+        if (video) updateData.video = video;
+
+        const product = await Productmodel.findByIdAndUpdate(
+            id,
+            updateData,
+            { new: true }
+        );
+
+        if (!product) {
+            return res.status(404).send({
+                status: false,
+                message: "Product not found"
+            });
+        }
+
+        return res.status(200).send({
+            status: true,
+            message: "Product updated successfully",
+            product
+        });
+    } catch (error) {
+        console.error("Error updating product:", error);
+        return res.status(500).send({
+            status: false,
+            message: "Error updating product"
+        });
+    }
+};
+
+const deleteProduct = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const product = await Productmodel.findByIdAndDelete(id);
+
+        if (!product) {
+            return res.status(404).send({
+                status: false,
+                message: "Product not found"
+            });
+        }
+
+        return res.status(200).send({
+            status: true,
+            message: "Product deleted successfully",
+            product
+        });
+    } catch (error) {
+        console.error("Error deleting product:", error);
+        return res.status(500).send({
+            status: false,
+            message: "Error deleting product"
+        });
+    }
+};
+
+module.exports = { addproduct, getProducts, getProductById, getSimilarProducts, editProduct, deleteProduct };
+
