@@ -6,6 +6,7 @@ const addtoCart = async (req, res) => {
     try {
         const { productId, quantity,color,size } = req.body;
         const userid=req.user._id
+        console.log("dd",productId)
         const user = await Usermodel.findById(userid);
         if (!user) {
             return res.status(404).send({ error: 'User not found' });
@@ -21,7 +22,7 @@ const addtoCart = async (req, res) => {
                 cart: user.cart
             });
         } else {
-            user.cart.push({ product: productId, quantity: Number(quantity) ,color:color,size:size}); 
+            user.cart.push({ product: productId, quantity:quantity ,color:color,size:size}); 
         }
         
         await user.save();
@@ -47,6 +48,7 @@ const getUserCart = async (req, res) => {
         const user = await Usermodel.findById(userId);
         console.log(user)
         await user.populate('cart.product'); 
+
 
         return res.status(200).send({
             status: true,
