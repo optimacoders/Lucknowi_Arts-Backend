@@ -13,6 +13,7 @@ const Razorpay = require('razorpay');
 const AdminUser = require("./Admin/Routes/userRoute")
 const AdminSize = require('./Admin/Routes/sizeRoute')
 const adminColor = require("./Admin/Routes/colorRoute")
+const dashboard = require("./Admin/Routes/DashboardRoute")
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use("/payment", payment)
 app.use("/admin/user", AdminUser)
 app.use("/admin/size", AdminSize)
 app.use("/admin/color", adminColor)
+app.use("/dashboard", dashboard)
 
 // const instance = new Razorpay({
 //   key_id: process.env.RAZORPAY_KEY,
