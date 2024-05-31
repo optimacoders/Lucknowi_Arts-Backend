@@ -84,7 +84,12 @@ const addDeliveryDate = async (req, res) => {
 const getOrdersByUserId = async (req, res) => {
     try {
         const userId = req.user._id;
-        const orders = await Order.find({ userId }).populate("productId");
+        const filterQuery = req.query.filter || "";
+        let filter = {};
+        if (filterQuery) {
+            filter.status = filterQuery;
+        }
+        const orders = await Order.find({ userId, ...filter }).populate("productId").sort({ createdAt: -1 });
         res.status(200).json({ orders });
     } catch (error) {
         console.error('Error retrieving orders by user ID:', error);
