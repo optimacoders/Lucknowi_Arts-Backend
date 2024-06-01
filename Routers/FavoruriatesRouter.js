@@ -6,9 +6,9 @@ const router = express.Router();
 
 
 
-router.post("/",verifyToken, addFavouriates)
-router.get("/",verifyToken, getuserFavouriates)
-router.post("/remove",verifyToken, removeuserFavouriates)
+router.post("/", verifyToken, addFavouriates)
+router.get("/", verifyToken, getuserFavouriates)
+router.post("/remove", verifyToken, removeuserFavouriates)
 
 
-module.exports=router;
+module.exports = router;

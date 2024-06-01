@@ -2,6 +2,7 @@ const express = require('express');
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const Usermodel = require('../Models/Usermodel');
+const FavouritesModel = require("../Models/FavouritesModel")
 const jwt = require('jsonwebtoken');
 
 const signup = async (req, res) => {
@@ -117,19 +118,23 @@ const login = async (req, res) => {
 const getuserDetails = async (req, res) => {
     try {
         const user = req.user;
-        const userdetails = await Usermodel.findById(user.id)
+        const userdetails = await Usermodel.findById(user.id);
+
+        const favourites = await FavouritesModel.find({ user: user._id });
+        const productIds = favourites.map(fav => fav.product);
+
         return res.status(200).send({
             status: true,
-            message: "user details fetched succesfully",
-            userdetails
+            message: "User details fetched successfully",
+            userdetails,
+            favourites: productIds
         });
     } catch (error) {
+        console.error('Error fetching user details:', error);
         res.status(500).json({ error: 'Internal server error' });
-
     }
+};
 
-
-}
 
 
 const editUserDetails = async (req, res) => {
