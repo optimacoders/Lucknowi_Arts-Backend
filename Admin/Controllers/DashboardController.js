@@ -28,7 +28,7 @@ const cardsData = async (req, res) => {
         const startOfTomorrow = new Date(tomorrow.setHours(0, 0, 0, 0));
         const endOfTomorrow = new Date(tomorrow.setHours(23, 59, 59, 999));
         const ordersDueTomorrow = await orderModel.countDocuments({
-            dueDate: { $gte: startOfTomorrow, $lte: endOfTomorrow }
+            Delivery: { $gte: startOfTomorrow, $lte: endOfTomorrow }
         });
 
         res.status(200).json({
