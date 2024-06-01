@@ -1,11 +1,13 @@
 
 const express = require('express');
-const { addFavouriates } = require('../Controllers/FavouriateController');
+const { addFavouriates, getuserFavouriates } = require('../Controllers/FavouriateController');
+const verifyToken = require('../Middleware/Authenticating');
 const router = express.Router();
 
 
 
-router.post("/",addFavouriates)
+router.post("/",verifyToken, addFavouriates)
+router.get("/",verifyToken, getuserFavouriates)
 
 
 module.exports=router;
