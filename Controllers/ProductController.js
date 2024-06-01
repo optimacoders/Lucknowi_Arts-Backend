@@ -175,5 +175,35 @@ const deleteProduct = async (req, res) => {
     }
 };
 
-module.exports = { addproduct, getProducts, getProductById, getSimilarProducts, editProduct, deleteProduct };
+const searchProduct = async (req, res) => {
+    try {
+      const search = req.query.q || "";
+      const filter = {};
+      
+      if (search) {
+        filter.title = { $regex: ".*" + search + ".*", $options: "i" };
+      }
+  
+      const products = await Productmodel.find(filter);
+  
+      console.log(products);
+      return res.status(200).send({
+        success: true,
+        message: 'Products searched successfully',
+        products
+      });
+  
+    } catch (error) {
+      console.error("Error searching products:", error);
+      return res.status(500).send({
+        success: false,
+        message: 'Error searching products',
+        error: error.message
+      });
+    }
+  };
+  
+  
+
+module.exports = { addproduct, getProducts, getProductById, getSimilarProducts, editProduct, deleteProduct,searchProduct };
 
