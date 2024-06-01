@@ -19,7 +19,6 @@ const getuserFavouriates=async(req,res)=>{
   try {
     const userId = req.user._id;
     const favourites = await FavouritesModel.find({ user: userId }).populate("product user");
-    
     console.log(favourites)
     res.status(200).json({ status: true, message: 'Favoriates fetched successfully',favourites });
   } catch (error) {
@@ -27,5 +26,16 @@ const getuserFavouriates=async(req,res)=>{
   }
 }
 
+const removeuserFavouriates=async(req,res)=>{
+  try {
+    const userId = req.user._id;
+    const productId = req.body.productId; 
+    const favorite = await FavouritesModel.findOneAndDelete({ user: userId, product: productId });
+    res.status(200).json({ status: true, message: 'Favoriates removed successfully',favorite });
+  } catch (error) {
+    
+  }
+}
 
-module.exports={addFavouriates,getuserFavouriates}
+
+module.exports={addFavouriates,getuserFavouriates,removeuserFavouriates}
