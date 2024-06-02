@@ -53,7 +53,7 @@ const getProducts = async (req, res) => {
 
         const products = await Productmodel.find(filter).sort({ createdAt: -1 }).populate('category');
 
-        const paginatedData = applyPagination(products, page);
+        const paginatedData = applyPagination(products, page,limit=16);
         return res.status(200).json({
             status: true,
             message: "Products fetched",

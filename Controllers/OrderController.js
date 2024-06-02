@@ -133,8 +133,10 @@ const getAllOrders = async (req, res) => {
 const getmyOrder = async (req, res) => {
     try {
         const orderid = req.params.orderid
+        const page = req.query.page || 1;
         const order = await Order.findById(orderid).populate("productId");
-        res.status(200).json({ order });
+        const paginatedData = applyPagination(order, page);
+        res.status(200).json({ order:paginatedData });
     } catch (error) {
         console.error('Error retrieving all orders:', error);
         res.status(500).json({ error: 'Internal server error' });
