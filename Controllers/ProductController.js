@@ -107,7 +107,7 @@ const getSimilarProducts = async (req, res) => {
 const editProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, description, quantity, original_price, selling_price, image, category, size, color, video } = req.body;
+        const { title, description, quantity, original_price, selling_price, image, category, size, color, video, material } = req.body;
 
         const updateData = {};
         if (title) updateData.title = title;
@@ -120,6 +120,7 @@ const editProduct = async (req, res) => {
         if (size) updateData.size = size;
         if (color) updateData.color = color;
         if (video) updateData.video = video;
+        if (material) updateData.material = material;
 
         const product = await Productmodel.findByIdAndUpdate(
             id,
@@ -177,33 +178,33 @@ const deleteProduct = async (req, res) => {
 
 const searchProduct = async (req, res) => {
     try {
-      const search = req.query.q || "";
-      const filter = {};
-      
-      if (search) {
-        filter.title = { $regex: ".*" + search + ".*", $options: "i" };
-      }
-  
-      const products = await Productmodel.find(filter);
-  
-      console.log(products);
-      return res.status(200).send({
-        success: true,
-        message: 'Products searched successfully',
-        products
-      });
-  
-    } catch (error) {
-      console.error("Error searching products:", error);
-      return res.status(500).send({
-        success: false,
-        message: 'Error searching products',
-        error: error.message
-      });
-    }
-  };
-  
-  
+        const search = req.query.q || "";
+        const filter = {};
 
-module.exports = { addproduct, getProducts, getProductById, getSimilarProducts, editProduct, deleteProduct,searchProduct };
+        if (search) {
+            filter.title = { $regex: ".*" + search + ".*", $options: "i" };
+        }
+
+        const products = await Productmodel.find(filter);
+
+        console.log(products);
+        return res.status(200).send({
+            success: true,
+            message: 'Products searched successfully',
+            products
+        });
+
+    } catch (error) {
+        console.error("Error searching products:", error);
+        return res.status(500).send({
+            success: false,
+            message: 'Error searching products',
+            error: error.message
+        });
+    }
+};
+
+
+
+module.exports = { addproduct, getProducts, getProductById, getSimilarProducts, editProduct, deleteProduct, searchProduct };
 

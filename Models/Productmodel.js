@@ -34,14 +34,15 @@ const ProductSchema = mongoose.Schema({
         required: true,
     }],
     color: [{
-        type: String,
+        type: Object,
         required: true,
     }],
     video: {
         type: String
     },
     material: {
-        type: String
+        type: String,
+        default: null
     },
     createdAt: {
         type: Date,
