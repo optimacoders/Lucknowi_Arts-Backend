@@ -13,17 +13,9 @@ const addtoCart = async (req, res) => {
         }
         const existingProductIndex = user.cart.findIndex(item => item?.product?.toString() === productId);
 
-        if (existingProductIndex !== -1) {
-            user.cart[existingProductIndex].color = color;
-            user.cart[existingProductIndex].size = size;
-            return res.status(200).send({
-                status: true,
-                message: "Product already added to cart.",
-                cart: user.cart
-            });
-        } else {
-            user.cart.push({ product: productId, quantity:quantity ,color:color,size:size}); 
-        }
+      
+        user.cart.push({ product: productId, quantity:quantity ,color:color,size:size}); 
+    
         
         await user.save();
         await user.populate('cart.product');
@@ -105,9 +97,7 @@ const editCart= async(req,res)=>{
          status: true,
          message: "Cart updated",
          cart:user.cart
-         
-     });
-        
+     })
     } catch (error) {
         
     }

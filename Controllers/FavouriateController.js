@@ -1,4 +1,5 @@
-const FavouritesModel = require("../Models/FavouritesModel")
+const FavouritesModel = require("../Models/FavouritesModel");
+const applyPagination = require("../utils/dataUtils");
 
 const addFavouriates =async(req,res)=>{
   try {
@@ -18,9 +19,10 @@ const addFavouriates =async(req,res)=>{
 const getuserFavouriates=async(req,res)=>{
   try {
     const userId = req.user._id;
+    const page = req.query.page || 1;
     const favourites = await FavouritesModel.find({ user: userId }).populate("product user");
-    console.log(favourites)
-    res.status(200).json({ status: true, message: 'Favoriates fetched successfully',favourites });
+    const paginatedData = applyPagination(favourites, page);
+    res.status(200).json({ status: true, message: 'Favoriates fetched successfully',favourites:paginatedData });
   } catch (error) {
     
   }
