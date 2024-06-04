@@ -1,4 +1,5 @@
 const Order = require('../Models/OrderModel');
+const Productmodel = require('../Models/Productmodel');
 const Usermodel = require('../Models/Usermodel');
 const applyPagination = require('../utils/dataUtils');
 
@@ -27,6 +28,12 @@ const createOrder = async (req, res) => {
                 razorpay_payment_id,
                 paymentStatus
             });
+            
+            //reduce qunatity after order 
+            const reduceQuantity = await Productmodel.findById(product); 
+            reduceQuantity.quantity = reduceQuantity.quantity - quantity;
+            await reduceQuantity.save();
+            
             await order.save();
             createdOrders.push(order);
         }
