@@ -44,6 +44,10 @@ const ProductSchema = mongoose.Schema({
         type: String,
         default: null
     },
+    howToWash: {
+        type: String,
+        default: null
+    },
     createdAt: {
         type: Date,
         default: Date.now

@@ -4,7 +4,7 @@ const applyPagination = require("../utils/dataUtils")
 
 const addproduct = async (req, res) => {
     try {
-        const { title, description, quantity, original_price, selling_price, image, category, size, color, video, material } = req.body;
+        const { title, description, quantity, original_price, selling_price, image, category, size, color, video, material, howToWash } = req.body;
         const product = new Productmodel({
             title,
             description,
@@ -16,7 +16,8 @@ const addproduct = async (req, res) => {
             size,
             color,
             video,
-            material
+            material,
+            howToWash
         });
 
         await product.save();
@@ -53,7 +54,7 @@ const getProducts = async (req, res) => {
 
         const products = await Productmodel.find(filter).sort({ createdAt: -1 }).populate('category');
 
-        const paginatedData = applyPagination(products, page,limit=16);
+        const paginatedData = applyPagination(products, page, limit = 16);
         return res.status(200).json({
             status: true,
             message: "Products fetched",
@@ -107,7 +108,7 @@ const getSimilarProducts = async (req, res) => {
 const editProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, description, quantity, original_price, selling_price, image, category, size, color, video, material } = req.body;
+        const { title, description, quantity, original_price, selling_price, image, category, size, color, video, material, howToWash } = req.body;
 
         const updateData = {};
         if (title) updateData.title = title;
@@ -121,6 +122,7 @@ const editProduct = async (req, res) => {
         if (color) updateData.color = color;
         if (video) updateData.video = video;
         if (material) updateData.material = material;
+        if (howToWash) updateData.howToWash = howToWash;
 
         const product = await Productmodel.findByIdAndUpdate(
             id,
