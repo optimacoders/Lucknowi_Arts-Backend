@@ -207,6 +207,23 @@ const searchProduct = async (req, res) => {
 };
 
 
+const latestProducts=async(req,res)=>{
+try {
+    const products = await Productmodel.find({}).sort({ createdAt: -1 }).populate('category').limit(4);
+     return res.status(200).json({
+        status: true,
+        message: "latestProducts fetched",
+        latestproducts: products
+    });
+} catch (error) {
+    return res.status(500).send({
+        success: false,
+        message: 'Error searching products',
+        error: error.message
+    });
+}
+}
 
-module.exports = { addproduct, getProducts, getProductById, getSimilarProducts, editProduct, deleteProduct, searchProduct };
+
+module.exports = {latestProducts, addproduct, getProducts, getProductById, getSimilarProducts, editProduct, deleteProduct, searchProduct };
 

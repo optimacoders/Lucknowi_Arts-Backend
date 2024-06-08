@@ -15,6 +15,7 @@ const AdminSize = require('./Admin/Routes/sizeRoute')
 const adminColor = require("./Admin/Routes/colorRoute")
 const liked = require("./Routers/FavoruriatesRouter")
 const dashboard = require("./Admin/Routes/DashboardRoute")
+const review = require("./Routers/ReviewRouter")
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use("/admin/size", AdminSize)
 app.use("/admin/color", adminColor)
 app.use("/liked", liked)
 app.use("/dashboard", dashboard)
+app.use("/review",review )
 
 // const instance = new Razorpay({
 //   key_id: process.env.RAZORPAY_KEY,
