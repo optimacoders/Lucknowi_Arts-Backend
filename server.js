@@ -33,7 +33,6 @@ app.use("/pay", payment)
 
 app.use("/admin/category", category)
 app.use("/cart/", cart)
-app.use("/payment", payment)
 app.use("/admin/user", AdminUser)
 app.use("/admin/size", AdminSize)
 app.use("/admin/color", adminColor)

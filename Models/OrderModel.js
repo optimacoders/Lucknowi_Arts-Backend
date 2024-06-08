@@ -47,7 +47,7 @@ const orderSchema = mongoose.Schema({
         type: String,
         default: 'pending'
     },
-    razorpay_order_id: {
+    payu_transaction_id: {
         type: String,
     },
     razorpay_payment_id: {
