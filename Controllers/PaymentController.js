@@ -1,157 +1,71 @@
-const Razorpay = require("razorpay");
-const dotenv = require('dotenv');
-const Payment = require("../Models/Paymentmodel")
-const crypto = require("crypto");
-dotenv.config();
+const crypto = require('crypto');
 
+const PAYU_KEY = process.env.PAYU_KEY || 'your_payu_key';
+const PAYU_SALT = process.env.PAYU_SALT || 'your_payu_salt';
 
-const instance = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY,
-    key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
-
-const checkout = async (req, res) => {
-    const { amount } = req.body;
-    const options = {
-        amount: Number(amount * 100),
-        currency: "INR",
-    };
-    try {
-        const order = await instance.orders.create(options);
-        return res.status(200).send({
-            success: true,
-            order
-        });
-    } catch (error) {
-        return res.status(500).send({
-            success: false,
-            message: "Failed to create order"
-        });
+const dohash = async (req, res) => {
+  try {
+    const { txnid, amount, productinfo, firstname, email } = req.body;
+    if (!txnid || !amount || !productinfo || !firstname || !email) {
+      return res.status(400).json({ error: 'Missing required fields' });
     }
-}
-
-const paymentVerification = async (req, res) => {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
-
     
-    const body = razorpay_order_id + "|" + razorpay_payment_id;
+    const hashString = `${PAYU_KEY}|${txnid}|${amount}|${productinfo}|${firstname}|${email}|||||||||||${PAYU_SALT}`;
+    const hash = crypto.createHash('sha512').update(hashString).digest('hex');
+    console.log(hash);
 
-    const expectedSignature = crypto
-        .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-        .update(body.toString())
-        .digest("hex");
+    res.json({ hash });
+  } catch (error) {
+    console.error('Error generating hash:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
 
-    const isAuthentic = expectedSignature === razorpay_signature;
 
-    if (isAuthentic) {
 
-        await Payment.create({
-            razorpay_order_id,
-            razorpay_payment_id,
-            razorpay_signature,
-        });
+const paysuccess= async(req,res)=>{
+  console.log(req.body)
+  console.log(req.query.token);
 
-        res.redirect(
-            `http://localhost:3000/paymentsuccess?reference=${razorpay_payment_id}`
-        );
-    } else {
-        return res.status(400).json({
-            success: false,
-        });
-    }
+  const token = req.query.token;
+  if (token) {
+    return res.status(401).json({ status: false, message: "Unauthorized" });
+  }
+if(req.body.status=="success"){
+  const userId = req.user._id
+  const user = await Usermodel.findById(userId);
+  const cart = user.cart;
+  const createdOrders = [];
+  for (const cartItem of cart) {
+      const { product, quantity, color, size } = cartItem;
 
+      const order = new Order({
+          userId,
+          productId: product,
+          quantity,
+          color,
+          size,
+          address:user.address,
+          phoneNo:user.mobileNo,
+          orderValue:"1000",
+          paymentStatus:"done",
+          payu_transaction_id:req.body.mihpayid
+      });
+      console.log("uu",order)
+     
+      const reduceQuantity = await Productmodel.findById(product); 
+      reduceQuantity.quantity = reduceQuantity.quantity - quantity;
+      await reduceQuantity.save();
+      
+      await order.save();
+      createdOrders.push(order);
+  }
+
+  user.cart = [];
+  await user.save();
+
+  res.status(201).json({ status: true, message: 'Orders created successfully', orders: createdOrders });
 }
-
-const { validationResult } = require('express-validator');
-
-// Create Payment API
-const createPayment = async (req, res) => {
-    try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
-
-        const { userId, paymentId, orderId, razorpaySignature, verified } = req.body;
-
-        const payment = new Payment({
-            userId,
-            paymentId,
-            orderId,
-            razorpaySignature,
-            verified
-        });
-
-        await payment.save();
-
-        res.status(201).json({ message: 'Payment created successfully', payment });
-    } catch (error) {
-        console.error('Error creating payment:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-};
-
-// Get Payment by ID API
-const getPaymentById = async (req, res) => {
-    try {
-        const paymentId = req.params.paymentId;
-
-        const payment = await Payment.findById(paymentId);
-        if (!payment) {
-            return res.status(404).json({ message: 'Payment not found' });
-        }
-
-        res.status(200).json({ payment });
-    } catch (error) {
-        console.error('Error retrieving payment by ID:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-};
-
-// Update Payment API
-const updatePayment = async (req, res) => {
-    try {
-        const paymentId = req.params.paymentId;
-        const { verified } = req.body;
-
-        const payment = await Payment.findByIdAndUpdate(paymentId, { verified }, { new: true });
-        if (!payment) {
-            return res.status(404).json({ message: 'Payment not found' });
-        }
-
-        res.status(200).json({ message: 'Payment updated successfully', payment });
-    } catch (error) {
-        console.error('Error updating payment:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-};
-
-// Delete Payment API
-const deletePayment = async (req, res) => {
-    try {
-        const paymentId = req.params.paymentId;
-
-        const payment = await Payment.findByIdAndDelete(paymentId);
-        if (!payment) {
-            return res.status(404).json({ message: 'Payment not found' });
-        }
-
-        res.status(200).json({ message: 'Payment deleted successfully' });
-    } catch (error) {
-        console.error('Error deleting payment:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-};
-
-// Get All Payments API
-const getAllPayments = async (req, res) => {
-    try {
-        const payments = await Payment.find();
-        res.status(200).json({ payments });
-    } catch (error) {
-        console.error('Error retrieving all payments:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-};
-
-module.exports = { checkout, paymentVerification, createPayment, getPaymentById, updatePayment, deletePayment, getAllPayments };
+  
+}
+module.exports = { dohash,paysuccess };

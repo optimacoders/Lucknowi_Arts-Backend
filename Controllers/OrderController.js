@@ -4,49 +4,46 @@ const Usermodel = require('../Models/Usermodel');
 const applyPagination = require('../utils/dataUtils');
 
 
-const createOrder = async (req, res) => {
-    try {
-        const { address, phoneNo, orderValue, razorpay_order_id, razorpay_payment_id, paymentStatus } = req.body;
-        const userId = req.user._id
-        const user = await Usermodel.findById(userId);
-        const cart = user.cart;
+// const createOrder = async (req, res) => {
+//     try {
+//         const { paymentStatus } = req.body;
+//         const userId = req.user._id
+//         const user = await Usermodel.findById(userId);
+//         const cart = user.cart;
+//         const createdOrders = [];
+//         for (const cartItem of cart) {
+//             const { product, quantity, color, size } = cartItem;
 
-        const createdOrders = [];
-        for (const cartItem of cart) {
-            const { product, quantity, color, size } = cartItem;
-
-            const order = new Order({
-                userId,
-                productId: product,
-                quantity,
-                color,
-                size,
-                address,
-                phoneNo,
-                orderValue,
-                razorpay_order_id,
-                razorpay_payment_id,
-                paymentStatus
-            });
+//             const order = new Order({
+//                 userId,
+//                 productId: product,
+//                 quantity,
+//                 color,
+//                 size,
+//                 address:user.address,
+//                 phoneNo:user.mobileNo,
+//                 orderValue:"1000",
+//                 paymentStatus
+//             });
+//             console.log("uu",order)
+           
+//             const reduceQuantity = await Productmodel.findById(product); 
+//             reduceQuantity.quantity = reduceQuantity.quantity - quantity;
+//             await reduceQuantity.save();
             
-            //reduce qunatity after order 
-            const reduceQuantity = await Productmodel.findById(product); 
-            reduceQuantity.quantity = reduceQuantity.quantity - quantity;
-            await reduceQuantity.save();
-            
-            await order.save();
-            createdOrders.push(order);
-        }
+//             await order.save();
+//             createdOrders.push(order);
+//         }
 
-        user.cart = [];
-        await user.save();
+//         user.cart = [];
+//         await user.save();
 
-        res.status(201).json({ status: true, message: 'Orders created successfully', orders: createdOrders });
-    } catch (error) {
-        console.error('Error creating orders:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-};
+//         res.status(201).json({ status: true, message: 'Orders created successfully', orders: createdOrders });
+//     } catch (error) {
+//         console.error('Error creating orders:', error);
+//         res.status(500).json({ error: 'Internal server error' });
+//     }
+// };
 
 
 const updateOrderStatus = async (req, res) => {
@@ -148,4 +145,4 @@ const getmyOrder = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
-module.exports = { createOrder, updateOrderStatus, getOrdersByUserId, getAllOrders, getmyOrder, addDeliveryDate };
+module.exports = {  updateOrderStatus, getOrdersByUserId, getAllOrders, getmyOrder, addDeliveryDate };
