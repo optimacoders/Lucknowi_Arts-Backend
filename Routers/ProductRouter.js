@@ -4,9 +4,9 @@ const verifyToken = require('../Middleware/Authenticating');
 const router = express.Router();
 
 router.post('/', addproduct);
-router.get('/', getProducts);
+router.get('/:currency', getProducts);
 router.get('/latestProducts', latestProducts);
-router.get('/:id', getProductById);
+router.get('/:id/:currency', getProductById);
 router.get('/getsimilarproducts/:category', getSimilarProducts);
 router.put('/:id', verifyToken, editProduct)
 router.delete("/:id", verifyToken, deleteProduct)
