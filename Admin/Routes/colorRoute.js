@@ -4,7 +4,7 @@ const { getAllColors, getOneColor, addColor, editColor, deleteColor } = require(
 const verifyToken = require('../../Middleware/Authenticating');
 
 router.post('/addcolor', verifyToken, addColor);
-router.get('/', verifyToken, getAllColors);
+router.get('/', getAllColors);
 router.get('/:id', verifyToken, getOneColor);
 router.put('/editcolor/:id', verifyToken, editColor);
 router.delete('/deletecolor/:id', verifyToken, deleteColor);

@@ -40,16 +40,31 @@ const getProducts = async (req, res) => {
     try {
         const page = req.query.page || 1;
         const searchQuery = req.query.q || "";
-        const category = req.query.category;
+        let category = req.query.category;
+        let colour = req.query.colour;
 
+      
         let filter = {};
+        if (category === undefined || category === null || category === "") {
+           filter={}
+        }
+
+        
+        if (colour === undefined || colour === null || colour === "") {
+            colour = null;
+        }
+
 
         if (searchQuery) {
             filter.title = { $regex: searchQuery, $options: 'i' };
         }
 
-        if (category !== undefined) {
+        if (category !== null) {
             filter.category = category;
+        }
+
+        if (colour !== null && colour !== "") {
+            filter["color.name"] = colour;
         }
 
         const products = await Productmodel.find(filter).sort({ createdAt: -1 }).populate('category');
