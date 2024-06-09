@@ -252,13 +252,14 @@ const searchProduct = async (req, res) => {
 
 const latestProducts = async (req, res) => {
     try {
-        const products = await Productmodel.find({}).sort({ createdAt: -1 }).populate('category').limit(4);
+        const products = await Productmodel.find({}).sort({ createdAt: -1 }).limit(4);
         return res.status(200).json({
             status: true,
             message: "latestProducts fetched",
             latestproducts: products
         });
     } catch (error) {
+        console.log(error);
         return res.status(500).send({
             success: false,
             message: 'Error searching products',
