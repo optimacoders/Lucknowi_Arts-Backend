@@ -1,3 +1,4 @@
+const convert = require('../Middleware/CurrecyConvert');
 const Order = require('../Models/OrderModel');
 const Productmodel = require('../Models/Productmodel');
 const Usermodel = require('../Models/Usermodel');
@@ -26,11 +27,11 @@ const applyPagination = require('../utils/dataUtils');
 //                 paymentStatus
 //             });
 //             console.log("uu",order)
-           
+
 //             const reduceQuantity = await Productmodel.findById(product); 
 //             reduceQuantity.quantity = reduceQuantity.quantity - quantity;
 //             await reduceQuantity.save();
-            
+
 //             await order.save();
 //             createdOrders.push(order);
 //         }
@@ -89,11 +90,24 @@ const getOrdersByUserId = async (req, res) => {
     try {
         const userId = req.user._id;
         const filterQuery = req.query.filter || "";
+
+        const { currency } = req.params;
+
         let filter = {};
         if (filterQuery) {
             filter.status = filterQuery;
         }
         const orders = await Order.find({ userId, ...filter }).populate("productId").sort({ createdAt: -1 });
+
+        if (currency !== "INR") {
+            for (const product of orders) {
+                const convertedSellingPrice = await convert(product.productId.selling_price, "INR", currency);
+                product.productId.selling_price = Math.round(convertedSellingPrice * 100) / 100;
+
+                const convertedOriginalPrice = await convert(product.productId.original_price, "INR", currency);
+                product.productId.original_price = Math.round(convertedOriginalPrice * 100) / 100;
+            }
+        }
         res.status(200).json({ orders });
     } catch (error) {
         console.error('Error retrieving orders by user ID:', error);
@@ -136,13 +150,15 @@ const getAllOrders = async (req, res) => {
 
 const getmyOrder = async (req, res) => {
     try {
-        const orderid = req.params.orderid
+        const { orderid } = req.params;
         const page = req.query.page || 1;
+
         const order = await Order.findById(orderid).populate("productId");
+
         res.status(200).json({ order });
     } catch (error) {
         console.error('Error retrieving all orders:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
-module.exports = {  updateOrderStatus, getOrdersByUserId, getAllOrders, getmyOrder, addDeliveryDate };
+module.exports = { updateOrderStatus, getOrdersByUserId, getAllOrders, getmyOrder, addDeliveryDate };

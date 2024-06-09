@@ -7,7 +7,7 @@ const router = express.Router();
 
 
 router.post("/", verifyToken, addFavouriates)
-router.get("/", verifyToken, getuserFavouriates)
+router.get("/:currency", verifyToken, getuserFavouriates)
 router.post("/remove", verifyToken, removeuserFavouriates)
 
 

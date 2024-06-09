@@ -1,3 +1,4 @@
+const convert = require("../Middleware/CurrecyConvert");
 const WatchHistoryModal = require("../Models/WatchHistory");
 
 const addWatchHistory = async (req, res) => {
@@ -34,6 +35,7 @@ const addWatchHistory = async (req, res) => {
 const getUserWatchHistory = async (req, res) => {
     try {
         const userId = req.user._id;
+        const { currency } = req.params;
 
         let latestRecords = await WatchHistoryModal.find({ user: userId })
             .sort({ createdAt: -1 })
@@ -44,6 +46,17 @@ const getUserWatchHistory = async (req, res) => {
                 t.productId._id.toString() === item.productId._id.toString()
             ))
         ).slice(0, 4);
+
+
+        if (currency !== "INR") {
+            for (const product of latestRecords) {
+                const convertedSellingPrice = await convert(product.productId.selling_price, "INR", currency);
+                product.productId.selling_price = Math.round(convertedSellingPrice * 100) / 100;
+
+                const convertedOriginalPrice = await convert(product.productId.original_price, "INR", currency);
+                product.productId.original_price = Math.round(convertedOriginalPrice * 100) / 100;
+            }
+        }
 
         res.status(200).json({
             success: true,
