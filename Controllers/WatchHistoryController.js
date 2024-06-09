@@ -4,18 +4,24 @@ const addWatchHistory = async (req, res) => {
     try {
         const userId = req.user._id;
         const { productId } = req.body;
+        console.log(productId, 80080);
 
-        const updatedRecord = await WatchHistoryModal.findOneAndUpdate(
-            { user: userId, product: productId },
-            { $set: { createdAt: new Date() } },
-            { new: true, upsert: true }
-        );
+        const existingWatchHistory = await WatchHistoryModal.findOne({ user: userId, productId: productId });
+        console.log(existingWatchHistory);
 
-        res.status(200).json({
-            success: true,
-            message: 'Watch history updated successfully',
-            data: updatedRecord
-        });
+        if (existingWatchHistory) {
+            existingWatchHistory.createdAt = Date.now();
+            await existingWatchHistory.save();
+            return res.status(200).json({ status: true, msg: "Watch history updated successfully" });
+        } else {
+            const newWatchHistory = new WatchHistoryModal({
+                user: userId,
+                productId: productId,
+            });
+            await newWatchHistory.save();
+            return res.status(201).json({ status: true, msg: "Watch history added successfully" });
+        }
+
     } catch (error) {
         res.status(500).json({
             success: false,
@@ -29,9 +35,15 @@ const getUserWatchHistory = async (req, res) => {
     try {
         const userId = req.user._id;
 
-        const latestRecords = await WatchHistoryModal.find({ user: userId })
+        let latestRecords = await WatchHistoryModal.find({ user: userId })
             .sort({ createdAt: -1 })
-            .limit(4);
+            .populate("productId")
+
+        latestRecords = latestRecords.filter((item, index, self) =>
+            index === self.findIndex((t) => (
+                t.productId._id.toString() === item.productId._id.toString()
+            ))
+        ).slice(0, 4);
 
         res.status(200).json({
             success: true,
@@ -46,5 +58,6 @@ const getUserWatchHistory = async (req, res) => {
         });
     }
 };
+
 
 module.exports = { addWatchHistory, getUserWatchHistory };
