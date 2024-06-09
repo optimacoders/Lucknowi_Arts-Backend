@@ -6,6 +6,6 @@ const { addWatchHistory, getUserWatchHistory } = require("../Controllers/WatchHi
 
 
 router.post("/", verifyToken, addWatchHistory)
-router.get("/", verifyToken, getUserWatchHistory)
+router.get("/:currency", verifyToken, getUserWatchHistory)
 
 module.exports = router;
