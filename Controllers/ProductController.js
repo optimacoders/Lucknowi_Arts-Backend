@@ -46,13 +46,26 @@ const getProducts = async (req, res) => {
         const { currency } = req.params;
 
         let filter = {};
+        if (category === undefined || category === null || category === "") {
+           filter={}
+        }
+
+        
+        if (colour === undefined || colour === null || colour === "") {
+            colour = null;
+        }
+
 
         if (searchQuery) {
             filter.title = { $regex: searchQuery, $options: 'i' };
         }
 
-        if (category !== undefined) {
+        if (category !== null) {
             filter.category = category;
+        }
+
+        if (colour !== null && colour !== "") {
+            filter["color.name"] = colour;
         }
 
         const products = await Productmodel.find(filter).sort({ createdAt: -1 }).populate('category');
