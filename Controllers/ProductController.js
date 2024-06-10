@@ -47,14 +47,13 @@ const getProducts = async (req, res) => {
 
         let filter = {};
         if (category === undefined || category === null || category === "") {
-           filter={}
+            filter = {}
         }
 
-        
+
         if (colour === undefined || colour === null || colour === "") {
             colour = null;
         }
-
 
         if (searchQuery) {
             filter.title = { $regex: searchQuery, $options: 'i' };
@@ -251,6 +250,7 @@ const searchProduct = async (req, res) => {
 
 
 const latestProducts = async (req, res) => {
+    console.log("hbbuyhb");
     try {
         const products = await Productmodel.find({}).sort({ createdAt: -1 }).limit(4);
         return res.status(200).json({
@@ -259,10 +259,10 @@ const latestProducts = async (req, res) => {
             latestproducts: products
         });
     } catch (error) {
-        console.log(error);
+        console.log(error, 900909);
         return res.status(500).send({
             success: false,
-            message: 'Error searching products',
+            message: 'Error searching products hvygvy',
             error: error.message
         });
     }
