@@ -47,7 +47,7 @@ const getProducts = async (req, res) => {
 
         let filter = {};
         if (category === undefined || category === null || category === "") {
-           filter={}
+               category=""
         }
 
         
