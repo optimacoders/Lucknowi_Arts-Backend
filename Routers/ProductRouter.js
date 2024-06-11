@@ -3,14 +3,15 @@ const { addproduct, getProducts, getProductById, getSimilarProducts, editProduct
 const verifyToken = require('../Middleware/Authenticating');
 const router = express.Router();
 
-router.post('/', addproduct);
-router.get('/:currency', getProducts);
-router.get('/latestProducts', latestProducts);
+router.get('/latestProducts', latestProducts); 
 router.get('/:id/:currency', getProductById);
 router.get('/getsimilarproducts/:category', getSimilarProducts);
-router.put('/:id', verifyToken, editProduct)
-router.delete("/:id", verifyToken, deleteProduct)
+router.get('/', getProducts); 
+router.post('/', addproduct);
+router.put('/:id', verifyToken, editProduct);
+router.delete("/:id", verifyToken, deleteProduct);
 router.post('/search', searchProduct);
+
 
 
 module.exports = router

@@ -2,6 +2,7 @@ const express = require('express');
 const Productmodel = require("../Models/Productmodel");
 const applyPagination = require("../utils/dataUtils");
 const convert = require('../Middleware/CurrecyConvert');
+const mongoose = require("mongoose");
 
 const addproduct = async (req, res) => {
     try {
@@ -36,66 +37,61 @@ const addproduct = async (req, res) => {
     }
 }
 
-
 const getProducts = async (req, res) => {
     try {
-        const page = req.query.page || 1;
-        const searchQuery = req.query.q || "";
-        const category = req.query.category;
-
-        const { currency } = req.params;
-
-        let filter = {};
-        if (category === undefined || category === null || category === "") {
-               category=""
+      const page = req.query.page || 1;
+      const searchQuery = req.query.q || "";
+      const category = req.query.category;
+      const color = req.query.colour || "";
+      const { currency } = req.params;
+  
+      let filter = {};
+  
+      if (category && category !== 'null' && mongoose.Types.ObjectId.isValid(category)) {
+        filter.category = new mongoose.Types.ObjectId(category);
+      }
+  
+  
+      if (searchQuery) {
+        filter.title = { $regex: searchQuery, $options: 'i' };
+      }
+  
+      if (color && color.trim() !== "" && color !== 'null') {
+        filter["color.name"] = color;
+      }
+  
+      const products = await Productmodel.find(filter).sort({ createdAt: -1 }).populate('category');
+  
+      if (currency && currency !== "INR") {
+        for (const product of products) {
+          const convertedSellingPrice = await convert(product.selling_price, "INR", currency);
+          if (convertedSellingPrice !== null) {
+            product.selling_price = Math.round(convertedSellingPrice * 100) / 100;
+          }
+  
+          const convertedOriginalPrice = await convert(product.original_price, "INR", currency);
+          if (convertedOriginalPrice !== null) {
+            product.original_price = Math.round(convertedOriginalPrice * 100) / 100;
+          }
         }
-
-        
-        if (colour === undefined || colour === null || colour === "") {
-            colour = null;
-        }
-
-
-        if (searchQuery) {
-            filter.title = { $regex: searchQuery, $options: 'i' };
-        }
-
-        if (category !== null) {
-            filter.category = category;
-        }
-
-        if (colour !== null && colour !== "") {
-            filter["color.name"] = colour;
-        }
-
-        const products = await Productmodel.find(filter).sort({ createdAt: -1 }).populate('category');
-
-        if (currency !== "INR") {
-            for (const product of products) {
-                const convertedSellingPrice = await convert(product.selling_price, "INR", currency);
-                product.selling_price = Math.round(convertedSellingPrice * 100) / 100;
-
-                const convertedOriginalPrice = await convert(product.original_price, "INR", currency);
-                product.original_price = Math.round(convertedOriginalPrice * 100) / 100;
-            }
-        }
-
-        const paginatedData = applyPagination(products, page, limit = 16);
-        return res.status(200).json({
-            status: true,
-            message: "Products fetched",
-            products: paginatedData
-        });
-
+      }
+  
+      const paginatedData = applyPagination(products, page, 16); 
+      return res.status(200).json({
+        status: true,
+        message: "Products fetched",
+        products: paginatedData
+      });
+  
     } catch (error) {
-        console.error("Error fetching products:", error);
-        return res.status(500).json({
-            status: false,
-            message: "Error fetching products"
-        });
+      console.error("Error fetching products:", error);
+      return res.status(500).json({
+        status: false,
+        message: "Error fetching products"
+      });
     }
-};
-
+  };
+  
 
 
 const getProductById = async (req, res) => {
@@ -251,17 +247,19 @@ const searchProduct = async (req, res) => {
 
 
 const latestProducts = async (req, res) => {
+    console.log("hbbuyhb");
     try {
-        const products = await Productmodel.find({}).sort({ createdAt: -1 }).populate('category').limit(4);
+        const products = await Productmodel.find({}).sort({ createdAt: -1 }).limit(4);
         return res.status(200).json({
             status: true,
-            message: "latestProducts fetched",
+            message: "latest Products fetched",
             latestproducts: products
         });
     } catch (error) {
+        console.log(error, 900909);
         return res.status(500).send({
             success: false,
-            message: 'Error searching products',
+            message: 'Error searching products hvygvy',
             error: error.message
         });
     }

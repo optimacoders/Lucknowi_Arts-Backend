@@ -39,14 +39,16 @@ const getUserWatchHistory = async (req, res) => {
 
         let latestRecords = await WatchHistoryModal.find({ user: userId })
             .sort({ createdAt: -1 })
-            .populate("productId")
+            .populate("productId");
+
+        console.log(latestRecords, 9090);
 
         latestRecords = latestRecords.filter((item, index, self) =>
+            item.productId &&
             index === self.findIndex((t) => (
-                t.productId._id.toString() === item.productId._id.toString()
+                t.productId && t.productId._id.toString() === item.productId._id.toString()
             ))
         ).slice(0, 4);
-
 
         if (currency !== "INR") {
             for (const product of latestRecords) {
@@ -64,6 +66,8 @@ const getUserWatchHistory = async (req, res) => {
             data: latestRecords
         });
     } catch (error) {
+
+        console.log(error);
         res.status(500).json({
             success: false,
             message: 'An error occurred while retrieving watch history',
