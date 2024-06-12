@@ -43,7 +43,9 @@ const getProducts = async (req, res) => {
       const searchQuery = req.query.q || "";
       const category = req.query.category;
       const color = req.query.colour || "";
-      const { currency } = req.params;
+      const currency = req.query.currency;
+      const priceFrom = parseFloat(req.query.priceFrom);
+      const priceTo = parseFloat(req.query.priceTo);
   
       let filter = {};
   
@@ -60,6 +62,15 @@ const getProducts = async (req, res) => {
         filter["color.name"] = color;
       }
   
+
+    if (!isNaN(priceFrom) && !isNaN(priceTo)) {
+        filter.selling_price = { $gte: priceFrom, $lte: priceTo };
+      } else if (!isNaN(priceFrom)) {
+        filter.selling_price = { $gte: priceFrom };
+      } else if (!isNaN(priceTo)) {
+        filter.selling_price = { $lte: priceTo };
+      }
+
       const products = await Productmodel.find(filter).sort({ createdAt: -1 }).populate('category');
   
       if (currency && currency !== "INR") {
