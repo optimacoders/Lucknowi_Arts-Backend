@@ -46,13 +46,13 @@ const getProducts = async (req, res) => {
       const currency = req.query.currency;
       const priceFrom = parseFloat(req.query.priceFrom);
       const priceTo = parseFloat(req.query.priceTo);
+      const sort = req.query.sort || "createdAt";
   
       let filter = {};
   
       if (category && category !== 'null' && mongoose.Types.ObjectId.isValid(category)) {
         filter.category = new mongoose.Types.ObjectId(category);
       }
-  
   
       if (searchQuery) {
         filter.title = { $regex: searchQuery, $options: 'i' };
@@ -62,16 +62,26 @@ const getProducts = async (req, res) => {
         filter["color.name"] = color;
       }
   
-
-    if (!isNaN(priceFrom) && !isNaN(priceTo)) {
+      if (!isNaN(priceFrom) && !isNaN(priceTo)) {
         filter.selling_price = { $gte: priceFrom, $lte: priceTo };
       } else if (!isNaN(priceFrom)) {
         filter.selling_price = { $gte: priceFrom };
       } else if (!isNaN(priceTo)) {
         filter.selling_price = { $lte: priceTo };
       }
-
-      const products = await Productmodel.find(filter).sort({ createdAt: -1 }).populate('category');
+  
+      let sortOption = {};
+      if (sort === "price_low_to_high") {
+        sortOption = { selling_price: 1 };
+      } else if (sort === "price_high_to_low") {
+        sortOption = { selling_price: -1 };
+      } else if (sort === "a_to_z") {
+        sortOption = { title: 1 };
+      } else {
+        sortOption = { createdAt: -1 };
+      }
+  
+      const products = await Productmodel.find(filter).sort(sortOption).populate('category');
   
       if (currency && currency !== "INR") {
         for (const product of products) {
