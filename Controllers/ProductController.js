@@ -144,22 +144,29 @@ const getProductById = async (req, res) => {
 
 const getSimilarProducts = async (req, res) => {
     try {
-        const { category } = req.params;
-        // console.log(categoryid);
-        // console.log(category, 909090);
-        const products = await Productmodel.find({ category: category }).sort({ createdAt: -1 });
+        const { category,productId } = req.query;
+        let filter = {};
+
+        if (category && category !== 'null' && mongoose.Types.ObjectId.isValid(category)) {
+            filter.category = new mongoose.Types.ObjectId(category);
+        }
+
+        if (productId && mongoose.Types.ObjectId.isValid(productId)) {
+            filter._id = { $ne: new mongoose.Types.ObjectId(productId) };
+        }
+
+        const products = await Productmodel.find(filter).sort({ createdAt: -1 });
 
         return res.status(200).json({
             status: true,
             message: "Similar products fetched successfully",
-
+            products
         });
     } catch (error) {
         console.error("Error fetching similar products:", error);
         return res.status(500).json({
             status: false,
             message: "Error fetching similar products",
-            error: error.message
         });
     }
 };

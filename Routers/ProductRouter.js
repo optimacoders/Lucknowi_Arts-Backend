@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.get('/latestProducts', latestProducts); 
 router.get('/:id/:currency', getProductById);
-router.get('/getsimilarproducts/:category', getSimilarProducts);
+router.get('/getsimilarproducts', getSimilarProducts);
 router.get('/', getProducts); 
 router.post('/', addproduct);
 router.put('/:id', verifyToken, editProduct);
