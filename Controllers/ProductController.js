@@ -39,80 +39,80 @@ const addproduct = async (req, res) => {
 
 const getProducts = async (req, res) => {
     try {
-      const page = req.query.page || 1;
-      const searchQuery = req.query.q || "";
-      const category = req.query.category;
-      const color = req.query.colour || "";
-      const currency = req.query.currency;
-      const priceFrom = parseFloat(req.query.priceFrom);
-      const priceTo = parseFloat(req.query.priceTo);
-      const sort = req.query.sort || "createdAt";
-  
-      let filter = {};
-  
-      if (category && category !== 'null' && mongoose.Types.ObjectId.isValid(category)) {
-        filter.category = new mongoose.Types.ObjectId(category);
-      }
-  
-      if (searchQuery) {
-        filter.title = { $regex: searchQuery, $options: 'i' };
-      }
-  
-      if (color && color.trim() !== "" && color !== 'null') {
-        filter["color.name"] = color;
-      }
-  
-      if (!isNaN(priceFrom) && !isNaN(priceTo)) {
-        filter.selling_price = { $gte: priceFrom, $lte: priceTo };
-      } else if (!isNaN(priceFrom)) {
-        filter.selling_price = { $gte: priceFrom };
-      } else if (!isNaN(priceTo)) {
-        filter.selling_price = { $lte: priceTo };
-      }
-  
-      let sortOption = {};
-      if (sort === "price_low_to_high") {
-        sortOption = { selling_price: 1 };
-      } else if (sort === "price_high_to_low") {
-        sortOption = { selling_price: -1 };
-      } else if (sort === "a_to_z") {
-        sortOption = { title: 1 };
-      } else {
-        sortOption = { createdAt: -1 };
-      }
-  
-      const products = await Productmodel.find(filter).sort(sortOption).populate('category');
-  
-      if (currency && currency !== "INR") {
-        for (const product of products) {
-          const convertedSellingPrice = await convert(product.selling_price, "INR", currency);
-          if (convertedSellingPrice !== null) {
-            product.selling_price = Math.round(convertedSellingPrice * 100) / 100;
-          }
-  
-          const convertedOriginalPrice = await convert(product.original_price, "INR", currency);
-          if (convertedOriginalPrice !== null) {
-            product.original_price = Math.round(convertedOriginalPrice * 100) / 100;
-          }
+        const page = req.query.page || 1;
+        const searchQuery = req.query.q || "";
+        const category = req.query.category;
+        const color = req.query.colour || "";
+        const currency = req.query.currency;
+        const priceFrom = parseFloat(req.query.priceFrom);
+        const priceTo = parseFloat(req.query.priceTo);
+        const sort = req.query.sort || "createdAt";
+
+        let filter = {};
+
+        if (category && category !== 'null' && mongoose.Types.ObjectId.isValid(category)) {
+            filter.category = new mongoose.Types.ObjectId(category);
         }
-      }
-  
-      const paginatedData = applyPagination(products, page, 16); 
-      return res.status(200).json({
-        status: true,
-        message: "Products fetched",
-        products: paginatedData
-      });
-  
+
+        if (searchQuery) {
+            filter.title = { $regex: searchQuery, $options: 'i' };
+        }
+
+        if (color && color.trim() !== "" && color !== 'null') {
+            filter["color.name"] = color;
+        }
+
+        if (!isNaN(priceFrom) && !isNaN(priceTo)) {
+            filter.selling_price = { $gte: priceFrom, $lte: priceTo };
+        } else if (!isNaN(priceFrom)) {
+            filter.selling_price = { $gte: priceFrom };
+        } else if (!isNaN(priceTo)) {
+            filter.selling_price = { $lte: priceTo };
+        }
+
+        let sortOption = {};
+        if (sort === "price_low_to_high") {
+            sortOption = { selling_price: 1 };
+        } else if (sort === "price_high_to_low") {
+            sortOption = { selling_price: -1 };
+        } else if (sort === "a_to_z") {
+            sortOption = { title: 1 };
+        } else {
+            sortOption = { createdAt: -1 };
+        }
+
+        const products = await Productmodel.find(filter).sort(sortOption).populate('category');
+
+        if (currency && currency !== "INR") {
+            for (const product of products) {
+                const convertedSellingPrice = await convert(product.selling_price, "INR", currency);
+                if (convertedSellingPrice !== null) {
+                    product.selling_price = Math.round(convertedSellingPrice * 100) / 100;
+                }
+
+                const convertedOriginalPrice = await convert(product.original_price, "INR", currency);
+                if (convertedOriginalPrice !== null) {
+                    product.original_price = Math.round(convertedOriginalPrice * 100) / 100;
+                }
+            }
+        }
+
+        const paginatedData = applyPagination(products, page, 12);
+        return res.status(200).json({
+            status: true,
+            message: "Products fetched",
+            products: paginatedData
+        });
+
     } catch (error) {
-      console.error("Error fetching products:", error);
-      return res.status(500).json({
-        status: false,
-        message: "Error fetching products"
-      });
+        console.error("Error fetching products:", error);
+        return res.status(500).json({
+            status: false,
+            message: "Error fetching products"
+        });
     }
-  };
-  
+};
+
 
 
 const getProductById = async (req, res) => {
@@ -144,7 +144,7 @@ const getProductById = async (req, res) => {
 
 const getSimilarProducts = async (req, res) => {
     try {
-        const { category,productId } = req.query;
+        const { category, productId } = req.query;
         let filter = {};
 
         if (category && category !== 'null' && mongoose.Types.ObjectId.isValid(category)) {

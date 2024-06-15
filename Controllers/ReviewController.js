@@ -109,10 +109,13 @@ const WebsiteReview = async (req, res) => {
 
 const fetchWebsiteReviews = async (req, res) => {
     try {
-        const reviews = await Review.find({ isWebsiteReviews: true }).populate('userId');
+        const reviews = await Review.find({ isWebsiteReviews: true })
+            .sort({ createdAt: -1 })
+            .limit(4).populate('userId');
         res.status(200).json(reviews);
     } catch (error) {
         res.status(500).json({ message: "Server error", error });
     }
 };
+
 module.exports = { addReview, fetchProductReview, WebsiteReview, fetchWebsiteReviews }

@@ -33,7 +33,9 @@ const getuserFavouriates = async (req, res) => {
         product.product.original_price = Math.round(convertedOriginalPrice * 100) / 100;
       }
     }
-    const paginatedData = applyPagination(favourites, page);
+
+    const limit = 12;
+    const paginatedData = applyPagination(favourites, page, limit);
     res.status(200).json({ status: true, message: 'Favoriates fetched successfully', favourites: paginatedData });
   } catch (error) {
 

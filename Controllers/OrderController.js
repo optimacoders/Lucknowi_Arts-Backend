@@ -87,6 +87,7 @@ const addDeliveryDate = async (req, res) => {
 
 
 const getOrdersByUserId = async (req, res) => {
+    const page = req.query.page || 1;
     try {
         const userId = req.user._id;
         const filterQuery = req.query.filter || "";
@@ -108,7 +109,9 @@ const getOrdersByUserId = async (req, res) => {
                 product.productId.original_price = Math.round(convertedOriginalPrice * 100) / 100;
             }
         }
-        res.status(200).json({ orders });
+        const limit = 12;
+        const paginatedData = applyPagination(orders, page, limit);
+        res.status(200).json({ orders: paginatedData });
     } catch (error) {
         console.error('Error retrieving orders by user ID:', error);
         res.status(500).json({ error: 'Internal server error' });
