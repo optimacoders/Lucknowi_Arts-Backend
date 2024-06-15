@@ -36,7 +36,48 @@ const fetchProductReview = async (req, res) => {
 
         const reviews = await Review.find({ productId }).populate('userId').populate("productId");
 
-        res.status(200).json({ reviews });
+        const reviewStarsCount = {
+            one: 0,
+            two: 0,
+            three: 0,
+            four: 0,
+            five: 0
+        };
+
+        let totalRating = 0;
+
+        reviews.forEach(review => {
+            switch (review.rating) {
+                case 1:
+                    reviewStarsCount.one += 1;
+                    break;
+                case 2:
+                    reviewStarsCount.two += 1;
+                    break;
+                case 3:
+                    reviewStarsCount.three += 1;
+                    break;
+                case 4:
+                    reviewStarsCount.four += 1;
+                    break;
+                case 5:
+                    reviewStarsCount.five += 1;
+                    break;
+                default:
+                    break;
+            }
+            totalRating += review.rating;
+        });
+
+        const totalCount = reviews.length;
+        const averageRating = totalCount ? (totalRating / totalCount).toFixed(2) : 0;
+
+        res.status(200).json({
+            reviews,
+            totalCount,
+            averageRating,
+            ratingDistribution: reviewStarsCount
+        });
     } catch (error) {
         res.status(500).json({ message: "Server error", error });
     }
