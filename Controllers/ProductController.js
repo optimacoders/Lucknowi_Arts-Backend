@@ -296,9 +296,41 @@ const searchProduct = async (req, res) => {
 
 
 const latestProducts = async (req, res) => {
-    console.log("hbbuyhb");
     try {
         const products = await Productmodel.find({}).sort({ createdAt: -1 }).limit(4);
+
+        return res.status(200).json({
+            status: true,
+            message: "latest Products fetched",
+            latestproducts: products
+        });
+    } catch (error) {
+        console.log(error, 900909);
+        return res.status(500).send({
+            success: false,
+            message: 'Error searching products hvygvy',
+            error: error.message
+        });
+    }
+}
+
+const latestFullProducts = async (req, res) => {
+    const { currency } = req.query;
+    try {
+        const products = await Productmodel.find({}).sort({ createdAt: -1 }).limit(4);
+        if (currency && currency !== "INR") {
+            for (const item of products) {
+                const convertedSellingPrice = await convert(item?.selling_price, "INR", currency);
+                if (convertedSellingPrice !== null) {
+                    item.selling_price = Math.round(convertedSellingPrice * 100) / 100;
+                }
+
+                const convertedOriginalPrice = await convert(item?.original_price, "INR", currency);
+                if (convertedOriginalPrice !== null) {
+                    item.original_price = Math.round(convertedOriginalPrice * 100) / 100;
+                }
+            }
+        }
         return res.status(200).json({
             status: true,
             message: "latest Products fetched",
@@ -315,5 +347,5 @@ const latestProducts = async (req, res) => {
 }
 
 
-module.exports = { latestProducts, addproduct, getProducts, getProductById, getSimilarProducts, editProduct, deleteProduct, searchProduct };
+module.exports = { latestFullProducts, latestProducts, addproduct, getProducts, getProductById, getSimilarProducts, editProduct, deleteProduct, searchProduct };
 
