@@ -1,62 +1,68 @@
 const mongoose = require("mongoose");
 
-const orderSchema = mongoose.Schema({
+const orderSchema = mongoose.Schema(
+  {
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
     },
     productId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product',
-        required: true
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product',
+      required: true
     },
     quantity: {
-        type: Number,
-        required: true,
-        default: 0
+      type: Number,
+      required: true,
+      default: 0
     },
     color: {
-        type: String
+      type: String
     },
     size: {
-        type: String
+      type: String
     },
     address: {
-        type: String,
-        required: true
+      type: String,
+      required: true
     },
     phoneNo: {
-        type: String,
-        required: true
+      type: String,
+      required: true
     },
     status: {
-        type: String,
-        enum: ['Pending', 'Shipped', 'out', 'Delivered', 'cancelled'],
-        default: 'Pending'
+      type: String,
+      enum: ['Pending', 'Shipped', 'Out', 'Delivered', 'Cancelled'],
+      default: 'Pending'
     },
     orderDateTime: {
-        type: Date,
-        default: Date.now
+      type: Date,
+      default: Date.now
     },
     orderValue: {
-        type: Number,
-        required: true
+      type: Number,
+      required: true
     },
     paymentStatus: {
-        type: String,
-        default: 'pending'
+      type: String,
+      default: 'pending'
     },
     payu_transaction_id: {
-        type: String,
+      type: String
     },
     razorpay_payment_id: {
-        type: String,
-    }, Delivery: {
-        default: null,
-        type: Date,
+      type: String
     },
-});
+    delivery: {
+      type: Date,
+      default: null
+    }
+  },
+  {
+    timestamps: true
+  }
+);
 
 const Order = mongoose.model("Order", orderSchema);
 

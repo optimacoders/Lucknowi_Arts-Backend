@@ -151,17 +151,17 @@ const getAllOrders = async (req, res) => {
     }
 };
 
-const getmyOrder = async (req, res) => {
-    try {
-        const { orderid } = req.params;
-        const page = req.query.page || 1;
+    const getmyOrder = async (req, res) => {
+        try {
+            const { orderid } = req.params;
+            const page = req.query.page || 1;
 
-        const order = await Order.findById(orderid).populate("productId");
+            const order = await Order.findById(orderid).populate("productId").sort({ createdAt: -1 }); ;
 
-        res.status(200).json({ order });
-    } catch (error) {
-        console.error('Error retrieving all orders:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-};
+            res.status(200).json({ order });
+        } catch (error) {
+            console.error('Error retrieving all orders:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    };
 module.exports = { updateOrderStatus, getOrdersByUserId, getAllOrders, getmyOrder, addDeliveryDate };
