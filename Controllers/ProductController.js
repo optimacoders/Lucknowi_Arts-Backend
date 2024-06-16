@@ -126,6 +126,9 @@ const getProductById = async (req, res) => {
 
             const convertedIOriginalPrice = await convert(product?.original_price, "INR", currency);
             product.original_price = Math.round(convertedIOriginalPrice * 100) / 100;
+
+            const deliveryPrice = await convert("25", "USD", currency);
+            product.delivery = Math.round(deliveryPrice * 100) / 100;
         }
 
         return res.status(200).json({
@@ -144,7 +147,8 @@ const getProductById = async (req, res) => {
 
 const getSimilarProducts = async (req, res) => {
     try {
-        const { category, productId } = req.query;
+        const { category, productId, currency } = req.query;
+        const page = req.query.page || 1;
         let filter = {};
 
         if (category && category !== 'null' && mongoose.Types.ObjectId.isValid(category)) {
@@ -157,10 +161,27 @@ const getSimilarProducts = async (req, res) => {
 
         const products = await Productmodel.find(filter).sort({ createdAt: -1 });
 
+        if (currency && currency !== "INR") {
+            for (const item of products) {
+                console.log(item, 90909090);
+                const convertedSellingPrice = await convert(item?.selling_price, "INR", currency);
+                if (convertedSellingPrice !== null) {
+                    item.selling_price = Math.round(convertedSellingPrice * 100) / 100;
+                }
+
+                const convertedOriginalPrice = await convert(item?.original_price, "INR", currency);
+                if (convertedOriginalPrice !== null) {
+                    item.original_price = Math.round(convertedOriginalPrice * 100) / 100;
+                }
+            }
+        }
+
+        const paginatedData = applyPagination(products, page);
+
         return res.status(200).json({
             status: true,
             message: "Similar products fetched successfully",
-            products
+            products: paginatedData
         });
     } catch (error) {
         console.error("Error fetching similar products:", error);

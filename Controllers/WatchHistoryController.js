@@ -8,7 +8,6 @@ const addWatchHistory = async (req, res) => {
         console.log(productId, 80080);
 
         const existingWatchHistory = await WatchHistoryModal.findOne({ user: userId, productId: productId });
-        console.log(existingWatchHistory);
 
         if (existingWatchHistory) {
             existingWatchHistory.createdAt = Date.now();
@@ -40,8 +39,6 @@ const getUserWatchHistory = async (req, res) => {
         let latestRecords = await WatchHistoryModal.find({ user: userId })
             .sort({ createdAt: -1 })
             .populate("productId");
-
-        console.log(latestRecords, 9090);
 
         latestRecords = latestRecords.filter((item, index, self) =>
             item.productId &&
